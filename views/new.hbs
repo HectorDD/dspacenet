@@ -1,0 +1,48 @@
+
+
+<div id="container">
+
+    <div class="row" id="headerlogin">
+      <div class="col-md-2"><img src="images/logob.png" width=70px height=width></div>
+
+      <div class="col-md-8"><strong><h2>Welcome to DSpaceNet</h4></strong></div>
+      <div class="col-md-2">
+      
+      <input  type="button" class="btn btn-info" id="help" value="(?)" />
+      </div>
+     
+    </div>
+
+
+
+<center>
+<br>
+<div id="logind">
+  
+  <form action="/new/login" method="post">
+    <p id="process-paragraph">
+    <strong>
+    Username: 
+    </strong>
+    </p>
+    <div id="logintext">
+    <input class="form-control" type="text" name="user" id="user">
+    </div>
+    <br>
+    <p id="process-paragraph">
+    <strong>
+    Password: 
+    </strong>
+    </p>
+    <div id="logintext">
+    <input class="form-control" type="password" name="password" id="password">
+    </div>
+    <br>
+    <input class="btn btn-primary" type="submit" value="Login">
+  </form>
+  <br>
+  <p id="error">{{error}}</p>
+</div>
+  </center>
+
+</div>

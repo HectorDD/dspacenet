@@ -1,0 +1,140 @@
+
+<center>
+<div class="row" id="rowheader">
+  <div class="col-md-12" id="header">
+    
+    
+    
+    <div class="row" id="headerson">
+      <div class="col-md-1"><img src="images/logob.png" width=36px height=width></div>
+      <div class="col-md-2"><input type="button" class="btn btn-primary" id="showf" value="hide friends" /></div>
+      <div class="col-md-4"><strong><h4>{{user}}'s space</h4></strong></div>
+      <div class="col-md-3">
+      <a href="/wall"><div id="username"><img class="img-circle" width=36px height=width src="images/{{user}}.jpg" > {{user}}({{id_user}}) </div> </a>
+
+      </div>
+      <div class="col-md-2">
+      <a href="/logout" id="logout" type="button" class="btn btn-warning">Logout</a>
+      <input type="button" class="btn btn-info" id="help" value="(?)" />
+      </div>
+     
+    </div>
+
+    
+  </div>
+</div>
+<div class="row" id="rowcontent">
+    <div class="col-md-3" id="left-col">
+  <div  id="friends">
+    <p class="wall">Friends list</p>
+    <div id="dfriends">
+    {{#each friends}}
+    <div id="onefriend">
+      <a href="/friend/{{this.id_user2}}" ><img class="img-circle" width=32px height=width src="images/{{this.user}}.jpg"> {{this.user}}({{this.id_user2}})</a>
+      <a href="../send/{{this.id_user2}}/{{this.user}}"><img src="images/msg.png"> </a>
+    </div>
+
+    {{/each}}
+    </div>
+    {{#ifCond user_messages '!=' 'None'}}
+    
+    <p class="wall">{{user_messages}} </p>
+    <div id="dmessages">
+      
+    {{#each messages_to}}
+    {{#ifCond this.user_msg '==' ../user}}
+    <div id="onemessageto" align="right">
+      {{this.msg}}
+    </div>
+    {{/ifCond}}
+    {{#ifCond this.user_msg '!=' ../user}}
+    <div id="onemessagefrom" align="right">
+      {{this.msg}}
+    </div>
+    {{/ifCond}}
+    {{/each}}
+    <div id="wallmessage">
+      <form action="/send" method="post">
+      <input class="form-control" type="text" name="message" id="message" ></input>
+      <br/>
+      <input type="submit" class="btn btn-primary" value="Send" /> 
+      <br/>
+      </form>
+    </div >
+    <script type="text/javascript">
+    $("#dmessages").scrollTop($("#dmessages")[0].scrollHeight);
+    </script>
+  </div>
+  {{/ifCond}}
+  
+  
+  </div>
+  
+  </div>
+
+    
+    
+  
+  
+  <div class="col-md-7" id="content">
+   <!-- This is the content -->  
+    <div id="processwall">
+      <img src="images/{{user}}.jpg" width="160px" height=width class="img-circle" >
+      <br><br>
+      <p id="process-paragraph">
+      Syntax: 
+      <br>
+
+      
+      <input type="button" class="btn" id="tell" value="tell(c)" />
+      <input type="button" class="btn" id="when" value="when c do P" />
+      <input type="button" class="btn" id="par" value="P || Q" />
+      <input type="button" class="btn" id="enteri" value="enter i do P" />
+      <input type="button" class="btn" id="exiti" value="exit i do P" />
+      <input type="button" class="btn" id="rec" value="rec 'x(P)" />
+      <input type="button" class="btn" id="vx" value="v('x)" />
+
+      </p>
+
+      <div id="wallmessage">
+      <form action="/wall/post" method="post">
+      <input class="form-control" type="text" name="config" id="config" ></input>
+      <br/>
+      <input type="submit" class="btn btn-primary" id="runsccp" value="Post"> 
+      <input type="button" class="btn btn-warning" id="clean" value="clear">
+      <input type="button" class="btn btn-warning" id="skip" value="skip">
+      {{#ifCond error '==' '1'}}
+      <script type="text/javascript">
+        alert("Something went wrong.");
+      </script>
+      {{/ifCond}}
+      </form>
+      </div>
+      <br/>
+      <div id="refreshsccp"><input type="button" class="btn btn-success" id="refreshsccp" value="Refresh" /></div>
+      <br/>
+      {{#each memoria}}
+        <div id="wallmessage">
+          <b>{{this.user_msg}} :</b>  {{this.msg}}
+          
+        </div>
+
+      {{/each}}
+    </div>
+    
+    
+    <!-- /This is the content -->  
+  </div>
+  
+
+  
+  
+    <div class="col-md-2" >
+     <!-- <p class="wall">Other Thing</p> --> 
+    
+  </div>  
+    
+  
+</div>
+
+</center>

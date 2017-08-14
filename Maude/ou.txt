@@ -1,0 +1,61 @@
+		     \||||||||||||||||||/
+		   --- Welcome to Maude ---
+		     /||||||||||||||||||\
+	   Maude 2.7.1 built: Jun 27 2016 16:35:16
+	    Copyright 1997-2016 SRI International
+		   Thu Aug 10 18:59:06 2017
+Maude> ==========================================
+search in STRING-PATTERN : "hello frank we are in a meeting" | [?]* . "frank" .
+    [?]* =>* "" | "" .
+
+Solution 1 (state 98)
+states: 99  rewrites: 6746 in 4ms cpu (3ms real) (1686500 rewrites/second)
+empty substitution
+
+No more solutions.
+states: 100  rewrites: 6758 in 4ms cpu (3ms real) (1689500 rewrites/second)
+==========================================
+search in STRING-PATTERN : "ab" | ? . ? =>* "" | "" .
+
+Solution 1 (state 2)
+states: 3  rewrites: 51 in 0ms cpu (0ms real) (~ rewrites/second)
+empty substitution
+
+No more solutions.
+states: 3  rewrites: 60 in 0ms cpu (0ms real) (~ rewrites/second)
+==========================================
+search in STRING-PATTERN : "ab" | "a" . * & * . "b" v "c" . * & * . "d" =>* ""
+    | "" .
+
+Solution 1 (state 3)
+states: 4  rewrites: 368 in 0ms cpu (0ms real) (~ rewrites/second)
+empty substitution
+
+No more solutions.
+states: 4  rewrites: 624 in 0ms cpu (0ms real) (~ rewrites/second)
+==========================================
+search in STRING-PATTERN : "ab" | "c" . * & * . "d" v "d" . * & * . "b" =>* ""
+    | "" .
+
+No solution.
+states: 3  rewrites: 357 in 0ms cpu (0ms real) (~ rewrites/second)
+==========================================
+search in STRING-PATTERN : "af" | ("a" v "c") . ("b" v "d") =>* "" | "" .
+
+No solution.
+states: 4  rewrites: 108 in 0ms cpu (0ms real) (~ rewrites/second)
+==========================================
+search in STRING-PATTERN : "01011010100010101" | ["0" v "1"]* =>* "" | "" .
+
+Solution 1 (state 52)
+states: 53  rewrites: 1516 in 4ms cpu (0ms real) (379000 rewrites/second)
+empty substitution
+
+No more solutions.
+states: 54  rewrites: 1527 in 4ms cpu (0ms real) (381750 rewrites/second)
+==========================================
+search in STRING-PATTERN : * . "01011010100010101" | ["0" v "1"]* =>* "" | "" .
+
+No solution.
+states: 1  rewrites: 0 in 0ms cpu (0ms real) (~ rewrites/second)
+Maude> Bye.

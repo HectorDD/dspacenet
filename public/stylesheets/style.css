@@ -1,0 +1,210 @@
+html,body {
+  font: 14px "Lucida Grande", Helvetica, Arial, serif;
+  max-height: 100%;
+  overflow-x: hidden;
+  
+}
+
+
+
+#dbody{
+
+  max-height: 100% ;
+  min-height: 100%;
+}
+a {
+  color: #00B7FF;
+}
+
+#process {
+  background-color:#FFFFFF;
+  padding:7px;
+  width:90%;
+}
+
+#processwall {
+  padding:7px;
+  border-radius: 4px;
+
+
+}
+
+#logind {
+
+
+  width:40%;
+
+  
+  padding:10px;
+
+  color: black ;
+  border: 1px solid rgba(0, 0, 200, .2);
+  border-radius: 4px;
+  background-color: white;
+}
+
+#logintext {
+  width:60%;
+  border-radius: 10px 10px 10px 10px ;
+}
+
+
+#header {
+
+  padding:0px;
+  min-height: 60px;
+
+ 
+  
+
+}
+
+#headerson{
+  vertical-align: middle;
+  position: fixed;
+  width:105%;
+  text-align:center ;
+  color: white ;
+  background-color: #11025A;
+  padding:8px;
+  z-index:2;
+
+}
+
+#headerlogin{
+  vertical-align: middle;
+  width:105%;
+  text-align:center ;
+  color: white ;
+  background-color: #11025A;
+  padding:8px;
+  z-index:2;
+}
+
+#left-col{
+ min-height:740px ;  
+ 
+}
+
+#friends {
+  padding: 7px 7px 7px 7px;
+  text-align:center ;
+  border: 1px solid rgba(0, 0, 200, .2);
+  background-color: white ;
+  border-radius: 4px 4px 4px 4px;
+  max-height: 700px;
+  position: fixed;
+  z-index:2;
+  visibility: visible;
+  width:25%;
+  min-height:510px ;
+
+}
+
+#onefriend {
+  padding:3px;
+  text-align:center ;
+  color: black ;
+  border: 1px solid rgba(0, 0, 200, .2);
+  border-radius: 4px;
+  margin-bottom: 3px ;
+
+}
+
+
+#content {
+  padding:10px 60px 10px 60px;
+  text-align:center ;
+  color: black ;
+
+}
+
+
+
+#footer {
+  padding:15px;
+
+  background-color:#FFFFFF;
+}
+
+#process-paragraph {
+  font-size: 15px ;
+}
+
+p#error {
+  color:red;
+  font-size: 15px ;
+  font-weight: bold;
+}
+
+p.wall{
+  
+  font-size: 14px ;
+  font-weight: bold;
+}
+
+p.user_messages{
+  font-size: 15px ;
+  font-weight: bold;
+}
+
+p.from_messages{
+  font-size: 13px ;
+  font-weight: bold;
+}
+
+div#wallmessage{
+  padding:7px;
+  text-align:left ;
+  color: black ;
+  border: 1px solid rgba(0, 0, 200, .2);
+  border-radius: 4px;
+  background-color: white;
+  margin-bottom: 3px ;
+}
+
+div#onemessagefrom{
+  background-color: #11025A;
+  padding:5px;
+  text-align:left ;
+  color: white ;
+  border-radius: 0px 10px 10px 10px;
+  width:90%;
+  margin-bottom: 3px ;
+}
+
+div#onemessageto{
+  background-color: rgba(0, 0, 200, .2);
+  padding:5px;
+  text-align:right ;
+  color: black ;
+  border-radius: 10px 10px 0px 10px;
+  width:90%;
+  margin-left: 10%;
+  margin-bottom: 3px ;
+
+}
+
+#refreshsccp{
+  text-align:left;
+}
+
+div#dmessages{
+  padding:7px;
+  text-align:center ;
+  border: 1px solid rgba(0, 0, 200, .2);
+  background-color: white ;
+  border-radius: 4px ;
+  max-height:260px;
+  overflow-y:scroll;
+}
+div#dfriends{
+  min-height:250px ;
+  overflow-y:scroll;
+}
+
+div#username{
+  font-size:17px;
+  font-weight: bold;
+  background-color: rgba(17,2,90,0.05) ;
+}

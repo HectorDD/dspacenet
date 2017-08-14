@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{title}}</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+    function getUrlVars()
+        {
+            var vars = [], hash;
+            var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+            for(var i = 0; i < hashes.length; i++)
+            {
+                hash = hashes[i].split('=');
+                vars.push(hash[0]);
+                vars[hash[0]] = hash[1];
+            }
+            return vars;
+        }
+    $(document).ready(function(){
+        
+        
+        //$("#dmessages").animate({ scrollTop:  }, "fast");
+        //$('#dmessages').attr('scrollTop', $('#this').attr('scrollHeight'));
+    	$('#runsccp').click(function(){
+        var data = { 'config' : $('#config').val() };
+        $.ajax({
+                url : '',
+                data : data, 
+                method : 'post', //en este caso
+                dataType : 'application/json',
+                crossDomain : true,
+                success : function(response){
+                       //codigo de exito
+                       console.log("termino");
+                       $('#result').attr("value",response.result);
+                       console.log("termino");
+                },
+                error: function(error){
+                       //codigo error
+                       var resultante=JSON.parse(error.responseText);
+                       console.log(resultante.result);
+                       if(resultante.result=="Error")
+                       {
+                           alert("Something went wrong. Got back to the previous state.");
+                       }
+                       
+                }
+        });
+      });
+      $('#refreshsccp').click(function(){
+        console.log("refresh!!!!");
+        window.location.reload();
+      });
+      
+      $('#tell').click(function(){
+        if($("#config").val()==undefined){
+         $('#config').val("tell(c)");
+        }
+        else{
+         $('#config').val(($("#config").val()).concat(" tell(c)")); 
+        }
+        
+      });
+      
+      $('#clean').click(function(){
+        console.log("CLEAN");
+         $('#config').val("");
+        
+      });
+      
+      $('#skip').click(function(){
+        var data = { 'config' : 'skip' };
+        $.ajax({
+                url : window.location+'/post',
+                data : data, 
+                method : 'post', //en este caso
+                dataType : 'application/json',
+                crossDomain : true,
+                success : function(response){
+                       //codigo de exito
+                       console.log("termino");
+                       $('#result').attr("value",response.result);
+                       console.log("termino");
+                },
+                error: function(error){
+                       //codigo error
+                       var resultante=JSON.parse(error.responseText);
+                       console.log(resultante.result);
+                       if(resultante.result=="Error")
+                       {
+                           alert("Something went wrong. Got back to the previous state.");
+                       }
+                       
+                }
+        });
+        location.reload(); 
+        
+      });
+      
+      $('#when').click(function(){
+        
+        if($("#config").val()==undefined){
+         $('#config').val("when c do P");
+        }
+        else{
+         $('#config').val(($("#config").val()).concat(" when c do P")); 
+        }
+        
+      });
+      
+      $('#exiti').click(function(){
+        
+        if($("#config").val()==undefined){
+         $('#config').val("exit c do P");
+        }
+        else{
+         $('#config').val(($("#config").val()).concat(" exit c do P")); 
+        }
+        
+      });
+      
+      $('#enteri').click(function(){
+        
+        if($("#config").val()==undefined){
+         $('#config').val("enter c do P");
+        }
+        else{
+         $('#config').val(($("#config").val()).concat(" enter c do P")); 
+        }
+        
+      });
+      
+      $('#vx').click(function(){
+        if($("#config").val()==undefined){
+         $('#config').val("v('x)");
+        }
+        else{
+         $('#config').val(($("#config").val()).concat(" v('x)")); 
+        }
+        
+      });
+      
+      $('#rec').click(function(){
+        if($("#config").val()==undefined){
+         $('#config').val("rec 'x in P");
+        }
+        else{
+         $('#config').val(($("#config").val()).concat(" rec 'x in P")); 
+        }
+        
+      });
+      
+      $('#par').click(function(){
+        
+        if($("#config").val()==undefined){
+         $('#config').val("P || Q");
+        }
+        else{
+         $('#config').val(($("#config").val()).concat(" || ")); 
+        }
+        
+      });
+      
+      $('#help').click(function(){
+        alert("By AVISPA Research Group and Ecole Polytechnique. Héctor Delgado, Camilo Rueda and Frank Valencia .");
+      });
+      
+      $('#showf').click(function(){
+        if($('#friends').css("visibility") == "hidden"){
+            $('#friends').css("visibility","visible");
+            $('#showf').attr("value","hide friends");
+        }
+        else if($('#friends').css("visibility") == "visible"){
+            $('#friends').css("visibility","hidden");
+            $('#showf').attr("value","show friends");
+        }
+      });
+
+      $('#login').click(function(){
+        var data = { 'user' : $('#user').val() };
+        $.ajax({
+                url : '/new/login',
+                data : data, 
+                method : 'post', //en este caso
+                dataType : 'application/json',
+                crossDomain : true,
+                success : function(response){
+
+                },
+                error: function(error){
+
+                }
+        });
+        
+        
+        
+      });  
+      
+      
+      var err = getUrlVars()["error"];
+      if(err=="1"){
+          alert("The user doesn't exist");
+      }
+      else if(err=="2"){
+          alert("Incorrect username or password");
+      }
+      
+   
+    });
+      
+      
+      
+      
+    </script>
+  </head>
+  <body>
+    <div id="dbody">
+    {{{body}}}
+    </div>
+  </body>
+</html>

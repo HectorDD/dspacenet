@@ -1,0 +1,7 @@
+------ By: Héctor D. Delgado ----------
+
+Instrucciones para correr los servidores:
+
+1. Correr la base de datos sql con el comando: mysql-ctl start
+2. En una de las terminales, correr la interfaz python con el comando: python sccp.py
+3. En otra terminal, correr el servidor web con el comando: npm start 
