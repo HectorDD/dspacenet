@@ -5,8 +5,8 @@
 	    Copyright 1997-2016 SRI International
 		   Tue Aug 15 11:54:42 2017
 Maude> ==========================================
-reduce in NTCC-RUN : f(s(rec 'vpost in (tell("<0|frank.valencia>test") ||
-    unless "{k:57}" v "{k:all}" v "{k:p}" next v('vpost)), 2)) .
+reduce in SCCP-RUN : [post("<0|frank.valencia>test")]2 .
 rewrites: 6 in 0ms cpu (0ms real) (~ rewrites/second)
-result SpaInstruc: s(rec 'vpost in v('vpost), 2)
+result SpaInstruc: s(rec 'vpost in (tell("<0|frank.valencia>test") || unless
+    "{k:all}" v "{k:pid}" v "{k:p}" next v('vpost)), 2)
 Maude> Bye.

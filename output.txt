@@ -3,36 +3,14 @@
 		     /||||||||||||||||||\
 	   Maude 2.7.1 built: Jun 27 2016 16:35:16
 	    Copyright 1997-2016 SRI International
-		   Sat Aug 12 09:47:50 2017
+		   Tue Aug 15 11:54:42 2017
 Maude> ==========================================
-rewrite in SCCP-RUN : < (s(rec 'vpost in (tell("<394|frank.valencia>dsdsddsdnddasdadsad dsadasd sdsdasdasdasdasd daskdaskdajdasdjaskdjaslkd") || unless
-    "<kill:all-posts>" v "<kill:all>" v "<kill:pid>" next v('vpost)), 2) || s(
-    rec 'vpost in (tell("<395|hectordavid1228>hola") || unless
-    "<kill:all-posts>" v "<kill:all>" v "<kill:pid>" next v('vpost)), 1) || s(
-    rec 'vrep in (next v('vrep) || rec 'vpost in (tell("<394|frank.valencia>dsdsddsdnddasdadsad dsadasd sdsdasdasdasdasd daskdaskdajdasdjaskdjaslkd") || unless
-    "<kill:all-posts>" v "<kill:all>" v "<kill:pid>" next v('vpost))), 2) || s(
-    rec 'vwhenever in (next v('vwhenever) || ask "<" . * . "|" . * . ">" .
-    "dsdsddsdnddasdadsad" then tell("tack100")), 2) || s(rec 'vwhenever in (
-    next v('vwhenever) || ask "<" . * . "|" . * . ">" . "tick" then tell(
-    "tack3")), 2) || s(rec 'vwhenever in (next v('vwhenever) || ask "<" . * .
-    "|" . * . ">" . "dsdsddsdnddasdadsad" . * then tell("tack100")), 2) || s(
-    rec 'vwhenever in (next v('vwhenever) || ask "<" . * . "|" . * . ">" .
-    "tick" . * then tell("tack2")), 2)) || [skip]2 ; empty[empty-forest] > .
-rewrites: 1457648 in 896ms cpu (897ms real) (1626839 rewrites/second)
-result Conf: < s(next rec 'vrep in (next v('vrep) || rec 'vpost in (tell("<394|frank.valencia>dsdsddsdnddasdadsad dsadasd sdsdasdasdasdasd daskdaskdajdasdjaskdjaslkd") || unless "<kill:all-posts>" v "<kill:all>" v "<kill:pid>" next v(
-    'vpost))), 2) || s(next rec 'vwhenever in (next v('vwhenever) || ask "<" .
-    * . "|" . * . ">" . "dsdsddsdnddasdadsad" then tell("tack100")), 2) || s(
-    next rec 'vwhenever in (next v('vwhenever) || ask "<" . * . "|" . * . ">" .
-    "tick" then tell("tack3")), 2) || s(next rec 'vwhenever in (next v(
-    'vwhenever) || ask "<" . * . "|" . * . ">" . "dsdsddsdnddasdadsad" . * then
-    tell("tack100")), 2) || s(next rec 'vwhenever in (next v('vwhenever) || ask
-    "<" . * . "|" . * . ">" . "tick" . * then tell("tack2")), 2) || s(ask "<" .
-    * . "|" . * . ">" . "dsdsddsdnddasdadsad" then tell("tack100"), 2) || s(ask
-    "<" . * . "|" . * . ">" . "tick" then tell("tack3"), 2) || s(ask "<" . * .
-    "|" . * . ">" . "tick" . * then tell("tack2"), 2) || s(unless
-    "<kill:all-posts>" v "<kill:all>" v "<kill:pid>" next rec 'vpost in (tell("<394|frank.valencia>dsdsddsdnddasdadsad dsadasd sdsdasdasdasdasd daskdaskdajdasdjaskdjaslkd") || unless "<kill:all-posts>" v "<kill:all>" v "<kill:pid>" next v(
-    'vpost)), 2) || s(unless "<kill:all-posts>" v "<kill:all>" v "<kill:pid>"
-    next rec 'vpost in (tell("<395|hectordavid1228>hola") || unless
-    "<kill:all-posts>" v "<kill:all>" v "<kill:pid>" next v('vpost)), 1) ;
-    empty[empty[empty-forest] : "<395|hectordavid1228>hola"[empty-forest] : ("<394|frank.valencia>dsdsddsdnddasdadsad dsadasd sdsdasdasdasdasd daskdaskdajdasdjaskdjaslkd", "tack100")[empty-forest] : empty-forest] >
+rewrite in SCCP-RUN : < skip || s(rec 'vpost in (tell("<0|frank.valencia>test")
+    || unless "{k:all}" v "{k:57}" v "{k:p}" next v('vpost)), 2) ; empty[
+    empty-forest] > .
+rewrites: 256 in 0ms cpu (0ms real) (~ rewrites/second)
+result Conf: < s(unless "{k:57}" v "{k:all}" v "{k:p}" next rec 'vpost in (
+    tell("<0|frank.valencia>test") || unless "{k:57}" v "{k:all}" v "{k:p}"
+    next v('vpost)), 2) ; empty[empty[empty-forest] : empty[empty-forest] :
+    "<0|frank.valencia>test"[empty-forest] : empty-forest] >
 Maude> Bye.

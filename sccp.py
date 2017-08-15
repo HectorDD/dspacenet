@@ -10,6 +10,7 @@ nameprocess="process.txt"
 memoria=""
 procesos=""
 clock=0
+ntcctime=0
 
 def functionf():
     global procesos
@@ -46,6 +47,54 @@ def functionf():
     resultado=parsingResult[0]
     procesos = resultado
 
+##Function for translating the input process to machine language
+
+def translateProcess(process):
+    file = open("runtranslate.txt","w")
+    file.write("red in SCCP-RUN : "+process+" . \n")
+    file.close()
+    os.system('./Maude/maude.linux64 < runtranslate.txt > outputtranslate.txt')
+    archi = open("outputtranslate.txt","r")
+    notfound=True
+    r1=""
+    while(notfound and not("Bye." in r1) ):
+        r1=archi.readline()
+        if "result" in r1:
+            notfound=False
+    if(notfound):
+        stat=open("status.txt","w")
+        stat.write("Error")
+        semaforo=True
+        return jsonify({'result' : 'Error'})
+
+    else:
+        resultado=r1
+        notend=True
+        while(notend):
+            r1=archi.readline()
+            if "Bye." in r1:
+                notend=False
+            else:
+                resultado= resultado + r1[3:]
+        resultado=quitarSaltoLinea(resultado)
+    parsingResult=parse("result SpaInstruc: {}", resultado )
+    resultado=parsingResult[0]
+    return resultado
+
+##Function for adding the program id to new process
+def addPid(program):
+  global ntcctime
+  pidstr='{k:pid}'
+  index=program.find(pidstr)
+  oldindex=0
+  while index!=-1:
+      index=oldindex+index+3
+      pid=str(ntcctime)
+      program=program[:index]+pid+program[index+3:]
+      oldindex=index+len(pid)
+      index=program[oldindex:].find(pidstr)
+  print("ESTE ES EL PROGRAMA",program)
+  return program
 
 def tictac(c):
     cl=open("clock.txt","w")
@@ -57,36 +106,45 @@ def getClock():
     clock=cl.readline()
     cl.close()
     return int(clock)
+def ntccTictac(c):
+    cl=open("ntcctime.txt","w")
+    stwrite=str(c+1)
+    cl.write(stwrite)
+    cl.close()
+def getNtccTime():
+    cl=open("ntcctime.txt","r")
+    time=cl.readline()
+    cl.close()
+    return int(time)
+
 
 def addIdandOrder(program,id_user):
-  global clock
+  global ntcctime
   tellstr='post('
   index=program.find(tellstr)
   oldindex=0
+  ntcctime=getNtccTime()
   while index!=-1:
-      clock=getClock()
       index=oldindex+index+6
       userstr="<"+str(clock)+"|" +str(id_user)+">"
       program=program[:index]+userstr+program[index:]
       oldindex=index+len(userstr)
       index=program[oldindex:].find(tellstr)
-      tictac(clock)
   program=addIdandOrderSay(program,id_user)
   return program
 
 def addIdandOrderSay(program,id_user):
-  global clock
+  global ntcctime
   tellstr='say('
   index=program.find(tellstr)
   oldindex=0
+  ntcctime=getNtccTime()
   while index!=-1:
-      clock=getClock()
       index=oldindex+index+5
       userstr="<"+str(clock)+"|" +str(id_user)+">"
       program=program[:index]+userstr+program[index:]
       oldindex=index+len(userstr)
       index=program[oldindex:].find(tellstr)
-      tictac(clock)
   return program
 
 def extractInfo(msg):
@@ -255,6 +313,8 @@ def index():
 
 @app.route('/runsccp', methods=['POST'])
 def runsccp():
+    global ntcctime
+    ntcctime=getNtccTime()
     global semaforo
     if semaforo:   
         semaforo=False
@@ -264,6 +324,8 @@ def runsccp():
         recibido = request.json['config']
         userp = request.json['user']
         recibido = addIdandOrder(recibido,userp)
+	recibido = translateProcess(recibido)
+	recibido = addPid(recibido)
         procesos = recibido +" || " + procesos
         archi = open(nameinput,"w")
         archi.write("rew in SCCP-RUN : < "+procesos+" ; empty[empty-forest] > . \n")
@@ -298,6 +360,7 @@ def runsccp():
             if(resultado[0]=="r"):
                 saveState(resultado)
                 functionf()
+		ntccTictac(ntcctime)
             return jsonify({'result' : 'ok'})
     else:
         return jsonify({'result' : 'bussy'})

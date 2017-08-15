@@ -1,55 +1,53 @@
 # coding=utf-8
 
-from parse import * 
+global procesos
+
+procesos = 'repeat tell("hola")'
+
+from parse import *
+
+def quitarSaltoLinea(resultado):
+    nuevo=""
+    for i in resultado:
+        if i != '\n':
+            nuevo+=i
+    return nuevo
+
+import os
 
 
-clock=0
-def addIdandOrder(program,id_user):
-  global clock
-  tellstr='post('
-  index=program.find(tellstr)
-  oldindex=0
-  while index!=-1:
-      index=oldindex+index+6
-      userstr="<"+str(clock)+"," +str(id_user)+">"
-      program=program[:index]+userstr+program[index:]
-      oldindex=index+len(userstr)
-      index=program[oldindex:].find(tellstr)
-      clock+=1
-  return program
-  
-def extractInfo(msg):
-    parseResult=parse("<{}>{}",msg)
-    info=parseResult[0]
-    message=parseResult[1]
-    info=info.split(",")
-    r={'clock' : info[0] , 'user_msg' : info[1] , 'msg' : message }
-    return r
-    
-    
+def translateProcess():
+    global procesos
+    file = open("runtranslate.txt","w")
+    file.write("red in SCCP-RUN : "+procesos+" . \n")
+    file.close()
+    os.system('./Maude/maude.linux64 < runtranslate.txt > outputtranslate.txt')
+    archi = open("outputtranslate.txt","r")
+    notfound=True
+    r1=""
+    while(notfound and not("Bye." in r1) ):
+        r1=archi.readline()
+        if "result" in r1:
+            notfound=False
+    if(notfound):
+        stat=open("status.txt","w")
+        stat.write("Error")
+        semaforo=True
+        return jsonify({'result' : 'Error'})
+        
+    else:
+        resultado=r1
+        notend=True
+        while(notend):
+            r1=archi.readline()
+            if "Bye." in r1:
+                notend=False
+            else:
+                resultado= resultado + r1[3:]
+        resultado=quitarSaltoLinea(resultado)
+    parsingResult=parse("result SpaInstruc: {}", resultado )
+    resultado=parsingResult[0]
+    procesos = resultado
 
-##cadena='tell("olakase señor") || tell("jesus T_T") || tell("test") || when lala do tell("eh que vaina")'
-##print(addIdandOrder(cadena,1))
-
-mensajes=[]
-cadena2="<3,1>eh que vaina"
-result=extractInfo(cadena2)
-mensajes.append(result)
-cadena2="<1,1>jesus T_T"
-result=extractInfo(cadena2)
-mensajes.append(result)
-cadena2="<0,1>olakase senor"
-result=extractInfo(cadena2)
-mensajes.append(result)
-cadena2="<2,1>test"
-result=extractInfo(cadena2)
-mensajes.append(result)
-
-mensajes.sort(key=lambda clock: clock['clock'])
-print mensajes
-
-s="<0.1>primera prueba"
-parseResult=parse("<{}>{}",s)
-print parseResult[0]
-
-procesoproblema='exit 2 do enter 3 do when * . "hec" . * . "frank" . * do exit 3 do enter 2 do tell ("careful they are talking about you") '
+translateProcess()
+print(procesos)

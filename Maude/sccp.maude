@@ -5,7 +5,8 @@
 ---------------------------------------------------------
 
 
----- Module for String Pattern matching
+---- Module for Naive String Pattern Matching: The string S matches the pattern P iff (S | P) =>* ("" | "").
+ 
 mod STRING-PATTERN is
  pr STRING .
  sort Pattern .
@@ -20,14 +21,14 @@ mod STRING-PATTERN is
  op _._ : Pattern Pattern -> Pattern [ctor assoc id: "" prec 20] . 
  op * : -> Pattern . 
  op ? : -> Pattern .
- op _v_ : Pattern Pattern -> Pattern [ctor assoc comm prec 40] .
- op _&_ : Pattern Pattern -> Pattern [ctor assoc comm prec 30] .
+ op _v_ : Pattern Pattern -> Pattern [ctor  assoc comm prec 40] .
+ op _&_ : Pattern Pattern -> Pattern [ctor  assoc comm prec 30] .
  op [_]* : Pattern -> Pattern [ctor] .
  op (_|_) : String Pattern -> Comp [ctor] . 
  op header :  -> Pattern .
  op number :  -> Pattern .
  
- vars  P P' Q R : Pattern .
+ vars  P P' Q Q' R : Pattern .
  vars S S' : String .
  
  ---Defining functions car and cdr (inspired in lisp) but for patterns.
@@ -41,6 +42,12 @@ mod STRING-PATTERN is
  ceq strcar(S) = substr(S,0,1) if S =/= "" .
  ceq strcdr(S) = substr(S,1,length(S)) if S =/= "" .
 ---------------
+
+---Some Simplification rules
+ 
+eq P & P = P .
+eq P v P = P .
+
 
 ---Pattern Matching Rules
  
@@ -69,7 +76,6 @@ mod STRING-PATTERN is
   .
 
 
-
  crl [concat]:
   ( S | P . Q )  => ( S' | Q ) 
   if
@@ -83,11 +89,10 @@ crl [or]:
  S =/= ""
   .
 
----ToDo: This rule is not complete. 
 crl [and]:
-  ( S | (P & Q) )  =>  ( "" | "" )
+  ( S | (P & Q) )  =>  ( S' | (P' & Q') )
   if
- S =/= "" /\ ( S | P )  =>  ( "" | "" ) /\ ( S | Q )  =>  ( "" | "" )  
+ S =/= "" /\   P =/= ""  /\ Q =/= "" /\  ( S | P )  =>  ( S' | P' ) /\ ( S | Q )  =>  ( S' | Q' )  
   .
 
  rl [staroperatorcase0]:
@@ -97,7 +102,7 @@ crl [and]:
   ( S | [ P ]* )  =>  ( S |  P . [ P ]*  ) .
 
  eq number = [ "0" v "1" v "2" v "3" v "4" v "5" v "6" v "7" v "8" v "9" ]* .
- eq header = "<" . * . ">"  .
+ eq header = "<" .  * . ">"  .
 
 
 endm
@@ -352,7 +357,7 @@ mod SCCP is
 endm
 --------
 
- ---Derived Operators
+ ---Derived Operators & User Language .
 
 mod SYNTAXMOD is
  inc SCCP .
@@ -372,11 +377,15 @@ mod SYNTAXMOD is
  op now_do_ : Const SpaInstruc -> SpaInstruc [prec 30] .
  op now_then_else_ : Const SpaInstruc SpaInstruc -> SpaInstruc [prec 30] .
  op say(_) : Const -> SpaInstruc [strat (0) prec 30] .
-
-
+ op kill(_) : Const -> SpaInstruc [strat (0) prec 30] .
+ op kill-pid :  -> Const .
+ op kill-all : -> Const .
+ op kill-posts : -> Const .
+ op kill-post-cond : -> Const .
+ op kill-proc-cond : -> Const .
  vars P P' Q : SpaInstruc .
  var i : Nat .
- var c : Const .
+ vars c pid : Const .
  
   
  eq [P]i = s(P,i) .
@@ -385,23 +394,37 @@ mod SYNTAXMOD is
  eq exit i do P = x(P,i) .
  eq P @ i = s(P,i) . 
  eq P ^ i = x(P,i ) .
+
  
- eq kill(id) = tell("k:pid")
+ eq kill-all  = "{k:all}" .
+ eq kill-posts = "{k:p}" . 
+ eq kill-post-cond = kill-pid v kill-all v kill-posts .
+ eq kill-proc-cond = kill-pid v kill-all .
+ eq kill-pid = "{k:pid}" .
+
+
+ 
+ ceq kill(c) = tell(kill-all) if c = "all" .
+ ceq kill(c) = tell(kill-posts) if c = "posts" . 
+ ceq kill(c) = tell("{k:" + c + "}") if c =/= "all" /\ c =/= "posts" .
+ 
 
  eq post(c)  = rec 'vpost in ( tell(c) || 
-                    unless ([k:pid]" v "[k:all-p]" v "[k:all]") next v('vpost) ) .
+                    unless kill-post-cond next v('vpost) ) .
  
  eq repeat repeat P = repeat P . 
  eq repeat ( P ||  Q) = repeat P || repeat Q .
 
- eq repeat P = rec 'vrep in ( P || next v('vrep)) .
+ eq repeat P = rec 'vrep in ( P || unless kill-proc-cond next v('vrep)) .
  
- eq whenever c do P = rec 'vwhenever in ( ask header . c then P || next v('vwhenever)) .
- eq until c do P = rec 'vuntil in (P || unless c next v('vuntil)) .
- eq when c do P = rec 'vwhen in (ask c then P || unless c next v('vwhen)) . 
- eq while c do P = rec 'vwhile in (ask c then P || ask c then next v('vwhile)) .  
+ eq whenever c do P = rec 'vwhenever in ( ask header . c then P || unless kill-proc-cond next v('vwhenever)) .
+
+ eq until c do P = rec 'vuntil in (P || unless ( (header . c) v kill-proc-cond) next v('vuntil)) .
+
+ eq when c do P = rec 'vwhen in (ask header . c then P || unless ( (header . c) v kill-proc-cond ) next v('vwhen)) . 
+ eq while c do P = rec 'vwhile in (ask header . c then P || ask header . c then (unless kill-proc-cond  next v('vwhile)) ) .  
  eq now c do P = ask c then P .
- eq now c then P else Q =  (ask c then next P) || (unless c next Q) .
+ eq now c then P else Q =  (ask header . c then  unless kill-proc-cond next P) || (unless ( (header . c) v kill-proc-cond) next Q) .
 
  eq say(c) = tell(c) . 
 endm
