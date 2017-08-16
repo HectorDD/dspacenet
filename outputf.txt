@@ -3,10 +3,13 @@
 		     /||||||||||||||||||\
 	   Maude 2.7.1 built: Jun 27 2016 16:35:16
 	    Copyright 1997-2016 SRI International
-		   Tue Aug 15 11:54:42 2017
+		   Tue Aug 15 17:02:56 2017
 Maude> ==========================================
-reduce in NTCC-RUN : f(s(rec 'vpost in (tell("<0|frank.valencia>test") ||
-    unless "{k:57}" v "{k:all}" v "{k:p}" next v('vpost)), 2)) .
-rewrites: 6 in 0ms cpu (0ms real) (~ rewrites/second)
-result SpaInstruc: s(rec 'vpost in v('vpost), 2)
+reduce in NTCC-RUN : f(s(s(s(rec 'vpost in (tell("<74|hectordavid1228>hello!")
+    || unless "{k:74}" v "{k:all}" v "{k:p}" next v('vpost)), 1), 0), 2) || s(
+    rec 'vpost in (tell("<76|hectordavid1228>hola alex") || unless "{k:76}" v
+    "{k:all}" v "{k:p}" next v('vpost)), 1)) .
+rewrites: 15 in 0ms cpu (0ms real) (~ rewrites/second)
+result SpaInstruc: s(s(s(rec 'vpost in v('vpost), 1), 0), 2) || s(rec 'vpost in
+    v('vpost), 1)
 Maude> Bye.

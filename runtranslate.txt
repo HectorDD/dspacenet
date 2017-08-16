@@ -1,1 +1,1 @@
-red in SCCP-RUN : ([post("<0|frank.valencia>test")] 2) . 
+red in SCCP-RUN : ([tell("it should stop now")  || tell("it should stop now") ] 2) . 

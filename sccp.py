@@ -3,6 +3,13 @@ from parse import *
 
 ##Structure of messages: "(clock,id_user)message"
 
+def getNtccTime():
+    cl=open("ntcctime.txt","r")
+    time=cl.readline()
+    cl.close()
+    return int(time)
+
+
 nameinput="run.txt"
 nameoutput="output.txt"
 namememory="memory.txt"
@@ -10,7 +17,7 @@ nameprocess="process.txt"
 memoria=""
 procesos=""
 clock=0
-ntcctime=0
+ntcctime=getNtccTime()
 
 def functionf():
     global procesos
@@ -111,11 +118,7 @@ def ntccTictac(c):
     stwrite=str(c+1)
     cl.write(stwrite)
     cl.close()
-def getNtccTime():
-    cl=open("ntcctime.txt","r")
-    time=cl.readline()
-    cl.close()
-    return int(time)
+
 
 
 def addIdandOrder(program,id_user):
@@ -126,7 +129,7 @@ def addIdandOrder(program,id_user):
   ntcctime=getNtccTime()
   while index!=-1:
       index=oldindex+index+6
-      userstr="<"+str(clock)+"|" +str(id_user)+">"
+      userstr="<"+str(ntcctime)+"|" +str(id_user)+">"
       program=program[:index]+userstr+program[index:]
       oldindex=index+len(userstr)
       index=program[oldindex:].find(tellstr)
@@ -141,7 +144,7 @@ def addIdandOrderSay(program,id_user):
   ntcctime=getNtccTime()
   while index!=-1:
       index=oldindex+index+5
-      userstr="<"+str(clock)+"|" +str(id_user)+">"
+      userstr="<"+str(ntcctime)+"|" +str(id_user)+">"
       program=program[:index]+userstr+program[index:]
       oldindex=index+len(userstr)
       index=program[oldindex:].find(tellstr)

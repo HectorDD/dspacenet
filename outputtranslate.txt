@@ -3,10 +3,10 @@
 		     /||||||||||||||||||\
 	   Maude 2.7.1 built: Jun 27 2016 16:35:16
 	    Copyright 1997-2016 SRI International
-		   Tue Aug 15 11:54:42 2017
+		   Tue Aug 15 17:02:56 2017
 Maude> ==========================================
-reduce in SCCP-RUN : [post("<0|frank.valencia>test")]2 .
-rewrites: 6 in 0ms cpu (0ms real) (~ rewrites/second)
-result SpaInstruc: s(rec 'vpost in (tell("<0|frank.valencia>test") || unless
-    "{k:all}" v "{k:pid}" v "{k:p}" next v('vpost)), 2)
+reduce in SCCP-RUN : [tell("it should stop now") || tell(
+    "it should stop now")]2 .
+rewrites: 2 in 0ms cpu (0ms real) (~ rewrites/second)
+result SpaInstruc: s(tell("it should stop now"), 2)
 Maude> Bye.
