@@ -402,8 +402,7 @@ def runsccp():
             notend=True
             while(notend):
                 r1=archi.readline()
-                if "Bye." in r1:
-                    notend=False
+                if "Bye." in r1                                    notend=False
                 else:
                     resultado= resultado + r1[3:]
 

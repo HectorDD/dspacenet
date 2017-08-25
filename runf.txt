@@ -1,1 +1,1 @@
-red in NTCC-RUN : f(s(s(s(rec 'vpost in (tell("<74|hectordavid1228>hello!") || unless "{k:74}" v "{k:all}" v "{k:p}" next v('vpost)), 1), 0), 2) || s(rec 'vpost in (tell("<76|hectordavid1228>hola alex") || unless "{k:76}" v "{k:all}" v "{k:p}" next v('vpost)), 1)) . 
+red in NTCC-RUN : f(s(rec 'vpost in (tell("<365|hectordavid1228>hello world") || unless "{k:365}" v "{k:all}" v "{k:p}" next v('vpost)), 1) || s(rec 'vrep in (tell("{pid:365|hectordavid1228} post('hello world')") || unless "{k:365}" v "{k:all}" next v('vrep)), 1)) . 

@@ -44,14 +44,18 @@
       
     {{#each messages_to}}
     {{#ifCond this.user_msg '==' ../user}}
+    {{#ifCond this.user_msg '!=' 'private'}}
     <div id="onemessageto" align="right">
       {{this.msg}}
     </div>
     {{/ifCond}}
+    {{/ifCond}}
     {{#ifCond this.user_msg '!=' ../user}}
+    {{#ifCond this.user_msg '!=' 'private'}}
     <div id="onemessagefrom" align="right">
       {{this.msg}}
     </div>
+    {{/ifCond}}
     {{/ifCond}}
     {{/each}}
     <div id="wallmessage">
@@ -83,9 +87,9 @@
       <img src="images/global.png" width="160px" height=width class="img-circle" >
       <br><br>
       <p id="process-paragraph">
-      Syntax: 
+      <b>Public Posts </b>
       <br>
-
+      <!--
       
       <input type="button" class="btn" id="tell" value="tell(c)" />
       <input type="button" class="btn" id="when" value="when c do P" />
@@ -94,7 +98,7 @@
       <input type="button" class="btn" id="exiti" value="exit i do P" />
       <input type="button" class="btn" id="rec" value="rec 'x(P)" />
       <input type="button" class="btn" id="vx" value="v('x)" />
-
+      -->
       </p>
 
       <div id="wallmessage">
@@ -115,14 +119,15 @@
       <div id="refreshsccp"><input type="button" class="btn btn-success" id="refreshsccp" value="Refresh" /></div>
       <br/>
       {{#each memoria}}
-        <div id="wallmessage">
-          <b>(pid: {{this.clock}}){{this.user_msg}} :</b>  {{this.msg}}
+        {{#ifCond this.user_msg '!=' 'private'}}
+	<div id="wallmessage">
+          <b>{{this.user_msg}} :</b>  {{this.msg}}
           
         </div>
-
+        {{/ifCond}}
       {{/each}}
     </div>
-    
+      
     
     <!-- /This is the content -->  
   </div>

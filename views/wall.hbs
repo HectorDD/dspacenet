@@ -39,19 +39,25 @@
     </div>
     {{#ifCond user_messages '!=' 'None'}}
     
-    <p class="wall">{{user_messages}} </p>
+    <p class="wall">Private messages to {{user_messages}} </p>
     <div id="dmessages">
       
     {{#each messages_to}}
     {{#ifCond this.user_msg '==' ../user}}
+    {{#ifCond this.user_msg '!=' 'private'}}
     <div id="onemessageto" align="right">
-      {{this.msg}}
+      {{this.msg}}  [pid {{this.clock}}]
+
     </div>
     {{/ifCond}}
+    {{/ifCond}}
     {{#ifCond this.user_msg '!=' ../user}}
+    {{#ifCond this.user_msg '!=' 'private'}}
     <div id="onemessagefrom" align="right">
-      {{this.msg}}
+      {{this.msg}}  [pid {{this.clock}}]
+    
     </div>
+    {{/ifCond}}    
     {{/ifCond}}
     {{/each}}
     <div id="wallmessage">
@@ -77,24 +83,24 @@
     
   
   
-  <div class="col-md-7" id="content">
+  <div class="col-md-6" id="content">
    <!-- This is the content -->  
     <div id="processwall">
       <img src="images/{{user}}.jpg" width="160px" height=width class="img-circle" >
       <br><br>
       <p id="process-paragraph">
-      Syntax: 
+      <b>Public Posts</b> 
       <br>
 
       
-      <input type="button" class="btn" id="tell" value="tell(c)" />
+      <!--<input type="button" class="btn" id="tell" value="tell(c)" />
       <input type="button" class="btn" id="when" value="when c do P" />
       <input type="button" class="btn" id="par" value="P || Q" />
       <input type="button" class="btn" id="enteri" value="enter i do P" />
       <input type="button" class="btn" id="exiti" value="exit i do P" />
       <input type="button" class="btn" id="rec" value="rec 'x(P)" />
       <input type="button" class="btn" id="vx" value="v('x)" />
-
+-->
       </p>
 
       <div id="wallmessage">
@@ -115,11 +121,12 @@
       <div id="refreshsccp"><input type="button" class="btn btn-success" id="refreshsccp" value="Refresh" /></div>
       <br/>
       {{#each memoria}}
-        <div id="wallmessage">
-          <b>(pid: {{this.clock}}){{this.user_msg}} :</b>  {{this.msg}}
+        {{#ifCond this.user_msg '!=' 'private'}}
+	<div id="wallmessage">
+          <b>{{this.user_msg}}</b>:  {{this.msg}} 
           
         </div>
-
+        {{/ifCond}}
       {{/each}}
     </div>
     
@@ -130,9 +137,21 @@
 
   
   
-    <div class="col-md-2" >
-     <!-- <p class="wall">Other Thing</p> --> 
-    
+    <div class="col-md-3" id="right-col">
+        <input type="button" class="btn btn-primary" id="showp" value="hide posted processes" />
+
+	<br>
+	<div id="postedp">
+<!-- <p class="wall">Other Thing</p> -->
+
+        <!--p class="wall"> Posted Processes </p--> 
+        {{#each memoria}}
+          {{#ifCond this.class '==' 'process'}} 
+          <div id="wallmessage">{{this.msg}}</div>
+	  {{/ifCond}}	
+        {{/each}}
+
+        </div>
   </div>  
     
   

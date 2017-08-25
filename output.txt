@@ -3,20 +3,20 @@
 		     /||||||||||||||||||\
 	   Maude 2.7.1 built: Jun 27 2016 16:35:16
 	    Copyright 1997-2016 SRI International
-		   Tue Aug 15 17:02:56 2017
+		   Fri Aug 25 08:47:45 2017
 Maude> ==========================================
-rewrite in SCCP-RUN : < s(tell("it should stop now"), 2) || s(s(s(rec 'vpost in
-    (tell("<74|hectordavid1228>hello!") || unless "{k:74}" v "{k:all}" v
-    "{k:p}" next v('vpost)), 1), 0), 2) || s(rec 'vpost in (tell(
-    "<76|hectordavid1228>hola alex") || unless "{k:76}" v "{k:all}" v "{k:p}"
-    next v('vpost)), 1) ; empty[empty-forest] > .
-rewrites: 980 in 0ms cpu (0ms real) (~ rewrites/second)
-result Conf: < s(s(s(unless "{k:74}" v "{k:all}" v "{k:p}" next rec 'vpost in (
-    tell("<74|hectordavid1228>hello!") || unless "{k:74}" v "{k:all}" v "{k:p}"
-    next v('vpost)), 1), 0), 2) || s(unless "{k:76}" v "{k:all}" v "{k:p}" next
-    rec 'vpost in (tell("<76|hectordavid1228>hola alex") || unless "{k:76}" v
-    "{k:all}" v "{k:p}" next v('vpost)), 1) ; empty[empty[empty-forest] :
-    "<76|hectordavid1228>hola alex"[empty-forest] : "it should stop now"[empty[
-    empty[empty-forest] : "<74|hectordavid1228>hello!"[empty-forest] :
-    empty-forest] : empty-forest] : empty-forest] >
+rewrite in SCCP-RUN : < s(rec 'vpost in (tell(
+    "<365|hectordavid1228>hello world") || unless "{k:all}" v "{k:365}" v
+    "{k:p}" next v('vpost)), 1) || skip || s(rec 'vrep in (tell(
+    "{pid:365|hectordavid1228} post('hello world')") || unless "{k:365}" v
+    "{k:all}" next v('vrep)), 1) ; empty[empty-forest] > .
+rewrites: 650 in 0ms cpu (0ms real) (~ rewrites/second)
+result Conf: < s(unless "{k:365}" v "{k:all}" next rec 'vrep in (tell(
+    "{pid:365|hectordavid1228} post('hello world')") || unless "{k:365}" v
+    "{k:all}" next v('vrep)), 1) || s(unless "{k:365}" v "{k:all}" v "{k:p}"
+    next rec 'vpost in (tell("<365|hectordavid1228>hello world") || unless
+    "{k:365}" v "{k:all}" v "{k:p}" next v('vpost)), 1) ; empty[empty[
+    empty-forest] : ("<365|hectordavid1228>hello world",
+    "{pid:365|hectordavid1228} post('hello world')")[empty-forest] :
+    empty-forest] >
 Maude> Bye.

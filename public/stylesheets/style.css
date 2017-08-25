@@ -80,6 +80,11 @@ a {
   padding:8px;
   z-index:2;
 }
+#right-col{
+ min-height:740px ;  
+ 
+}
+
 
 #left-col{
  min-height:740px ;  
@@ -100,6 +105,22 @@ a {
   min-height:510px ;
 
 }
+
+#postedp {
+  padding: 7px 7px 7px 7px;
+  text-align:center ;
+ 
+  background-color: white ;
+  border-radius: 4px 4px 4px 4px;
+  max-height: 660px;
+  position: fixed;
+  z-index:2;
+  visibility: visible;
+  width:23%;
+  min-height:510px ;
+  spacing: 7px;
+}
+
 
 #onefriend {
   padding:3px;

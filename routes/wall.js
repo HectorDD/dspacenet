@@ -87,10 +87,16 @@ router.get('/' , function(req, res, next) {
 });
 
 
+
 router.post('/post' , function(req, res, next) {
  var id_user = req.session.id_user.toString();
  var user = req.session.user;
  var program = req.body.config;
+ if(program != "skip"){
+ var programcopy = program.replace(/"/g,"'");
+ console.log(programcopy);
+ program = program + ' || repeat tell("{pid:{pid}|'.concat(user.concat('} '.concat(programcopy.concat('")'))))
+ } 
  var fprog = "([".concat(program.concat("] ".concat(id_user.concat(")"))));
  var argsPost= {
              data: { "config": fprog , "user": user},

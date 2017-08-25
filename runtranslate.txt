@@ -1,1 +1,1 @@
-red in SCCP-RUN : ([tell("it should stop now")  || tell("it should stop now") ] 2) . 
+red in SCCP-RUN : ([post("<365|hectordavid1228>hello world") || repeat tell("{pid:{pid}|hectordavid1228} post('hello world')")] 1) . 

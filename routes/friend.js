@@ -1,3 +1,4 @@
+
 var express = require('express');
 var router = express.Router();
 var Client = require('node-rest-client').Client;
@@ -52,6 +53,12 @@ router.post('/:id1/post' , function(req, res, next) {
  var user_post = req.session.user;
  var id_user = req.params.id1;
  var program = req.body.config;
+ if(program != "skip"){
+ var programcopy = program.replace(/"/g,"'");
+ console.log(programcopy);
+ program = program + ' || repeat tell("{pid:{pid}|'.concat(user_post.concat('} '.concat(programcopy.concat('")'))))
+ }
+
  var fprog = "([".concat(program.concat("] ".concat(id_user.concat(")"))));
  var argsPost= {
              data: { "config": fprog , "user" : user_post },

@@ -21,11 +21,12 @@
             return vars;
         }
     $(document).ready(function(){
-        
+         $('#postedp').css("visibility","hidden");
+         $('#showp').attr("value","show posted processes");
         
         //$("#dmessages").animate({ scrollTop:  }, "fast");
         //$('#dmessages').attr('scrollTop', $('#this').attr('scrollHeight'));
-    	$('#runsccp').click(function(){
+        $('#runsccp').click(function(){
         var data = { 'config' : $('#config').val() };
         $.ajax({
                 url : '',
@@ -166,7 +167,7 @@
       });
       
       $('#help').click(function(){
-        alert("By AVISPA Research Group and Ecole Polytechnique. Héctor Delgado, Camilo Rueda and Frank Valencia .");
+        alert("By AVISPA Research Group and Ecole Polytechnique. Héctor Delgado, Camilo Rueda and Frank Valencia   \n\n Syntax  \n\n P:= post(c) | say(c) | whenever c do P | P || Q | repeat P | until c do P | when c do P | while c do P | now c do P | now c then P else Q | kill(c) \n");
       });
       
       $('#showf').click(function(){
@@ -179,6 +180,18 @@
             $('#showf').attr("value","show friends");
         }
       });
+
+     $('#showp').click(function(){
+        if($('#postedp').css("visibility") == "hidden"){
+            $('#postedp').css("visibility","visible");
+            $('#showp').attr("value","hide posted processes");
+        }
+        else if($('#postedp').css("visibility") == "visible"){
+            $('#postedp').css("visibility","hidden");
+            $('#showp').attr("value","show posted processes");
+        }
+      });
+
 
       $('#login').click(function(){
         var data = { 'user' : $('#user').val() };
