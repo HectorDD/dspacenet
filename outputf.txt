@@ -3,13 +3,25 @@
 		     /||||||||||||||||||\
 	   Maude 2.7.1 built: Jun 27 2016 16:35:16
 	    Copyright 1997-2016 SRI International
-		   Fri Aug 25 08:47:45 2017
+		   Mon Aug 28 20:13:28 2017
 Maude> ==========================================
 reduce in NTCC-RUN : f(s(rec 'vpost in (tell(
     "<365|hectordavid1228>hello world") || unless "{k:365}" v "{k:all}" v
-    "{k:p}" next v('vpost)), 1) || s(rec 'vrep in (tell(
-    "{pid:365|hectordavid1228} post('hello world')") || unless "{k:365}" v
-    "{k:all}" next v('vrep)), 1)) .
-rewrites: 13 in 0ms cpu (0ms real) (~ rewrites/second)
-result SpaInstruc: s(rec 'vpost in v('vpost), 1) || s(rec 'vrep in v('vrep), 1)
+    "{k:p}" next v('vpost)), 1) || s(rec 'vpost in (tell(
+    "<366|frank.valencia>hello") || unless "{k:366}" v "{k:all}" v "{k:p}" next
+    v('vpost)), 2) || s(rec 'vpost in (tell("<366|hectordavid1228>blablabla")
+    || unless "{k:366}" v "{k:all}" v "{k:p}" next v('vpost)), 1) || s(rec
+    'vpost in (tell("<366|hectordavid1228>hello, this is my wall") || unless
+    "{k:366}" v "{k:all}" v "{k:p}" next v('vpost)), 1) || s(rec 'vrep in (
+    tell("{pid:365|hectordavid1228} post('hello world')") || unless "{k:365}" v
+    "{k:all}" next v('vrep)), 1) || s(rec 'vrep in (tell(
+    "{pid:366|frank.valencia} post('hello')") || unless "{k:366}" v "{k:all}"
+    next v('vrep)), 2) || s(rec 'vrep in (tell(
+    "{pid:366|hectordavid1228} post('blablabla')") || unless "{k:366}" v
+    "{k:all}" next v('vrep)), 1) || s(rec 'vrep in (tell(
+    "{pid:366|hectordavid1228} post('hello, this is my wall')") || unless
+    "{k:366}" v "{k:all}" next v('vrep)), 1)) .
+rewrites: 59 in 0ms cpu (0ms real) (~ rewrites/second)
+result SpaInstruc: s(rec 'vpost in v('vpost), 1) || s(rec 'vpost in v('vpost),
+    2) || s(rec 'vrep in v('vrep), 1) || s(rec 'vrep in v('vrep), 2)
 Maude> Bye.

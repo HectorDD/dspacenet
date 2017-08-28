@@ -3,20 +3,50 @@
 		     /||||||||||||||||||\
 	   Maude 2.7.1 built: Jun 27 2016 16:35:16
 	    Copyright 1997-2016 SRI International
-		   Fri Aug 25 08:47:45 2017
+		   Mon Aug 28 20:13:28 2017
 Maude> ==========================================
 rewrite in SCCP-RUN : < s(rec 'vpost in (tell(
-    "<365|hectordavid1228>hello world") || unless "{k:all}" v "{k:365}" v
-    "{k:p}" next v('vpost)), 1) || skip || s(rec 'vrep in (tell(
-    "{pid:365|hectordavid1228} post('hello world')") || unless "{k:365}" v
+    "<366|hectordavid1228>hello, this is my wall") || unless "{k:all}" v
+    "{k:366}" v "{k:p}" next v('vpost)), 1) || s(rec 'vrep in (tell(
+    "{pid:366|hectordavid1228} post('hello, this is my wall')") || unless
+    "{k:366}" v "{k:all}" next v('vrep)), 1) || s(rec 'vpost in (tell(
+    "<365|hectordavid1228>hello world") || unless "{k:365}" v "{k:all}" v
+    "{k:p}" next v('vpost)), 1) || s(rec 'vpost in (tell(
+    "<366|frank.valencia>hello") || unless "{k:366}" v "{k:all}" v "{k:p}" next
+    v('vpost)), 2) || s(rec 'vpost in (tell("<366|hectordavid1228>blablabla")
+    || unless "{k:366}" v "{k:all}" v "{k:p}" next v('vpost)), 1) || s(rec
+    'vrep in (tell("{pid:365|hectordavid1228} post('hello world')") || unless
+    "{k:365}" v "{k:all}" next v('vrep)), 1) || s(rec 'vrep in (tell(
+    "{pid:366|frank.valencia} post('hello')") || unless "{k:366}" v "{k:all}"
+    next v('vrep)), 2) || s(rec 'vrep in (tell(
+    "{pid:366|hectordavid1228} post('blablabla')") || unless "{k:366}" v
     "{k:all}" next v('vrep)), 1) ; empty[empty-forest] > .
-rewrites: 650 in 0ms cpu (0ms real) (~ rewrites/second)
+rewrites: 5312 in 4ms cpu (4ms real) (1328000 rewrites/second)
 result Conf: < s(unless "{k:365}" v "{k:all}" next rec 'vrep in (tell(
     "{pid:365|hectordavid1228} post('hello world')") || unless "{k:365}" v
-    "{k:all}" next v('vrep)), 1) || s(unless "{k:365}" v "{k:all}" v "{k:p}"
-    next rec 'vpost in (tell("<365|hectordavid1228>hello world") || unless
-    "{k:365}" v "{k:all}" v "{k:p}" next v('vpost)), 1) ; empty[empty[
+    "{k:all}" next v('vrep)), 1) || s(unless "{k:366}" v "{k:all}" next rec
+    'vrep in (tell("{pid:366|frank.valencia} post('hello')") || unless
+    "{k:366}" v "{k:all}" next v('vrep)), 2) || s(unless "{k:366}" v "{k:all}"
+    next rec 'vrep in (tell("{pid:366|hectordavid1228} post('blablabla')") ||
+    unless "{k:366}" v "{k:all}" next v('vrep)), 1) || s(unless "{k:366}" v
+    "{k:all}" next rec 'vrep in (tell(
+    "{pid:366|hectordavid1228} post('hello, this is my wall')") || unless
+    "{k:366}" v "{k:all}" next v('vrep)), 1) || s(unless "{k:365}" v "{k:all}"
+    v "{k:p}" next rec 'vpost in (tell("<365|hectordavid1228>hello world") ||
+    unless "{k:365}" v "{k:all}" v "{k:p}" next v('vpost)), 1) || s(unless
+    "{k:366}" v "{k:all}" v "{k:p}" next rec 'vpost in (tell(
+    "<366|frank.valencia>hello") || unless "{k:366}" v "{k:all}" v "{k:p}" next
+    v('vpost)), 2) || s(unless "{k:366}" v "{k:all}" v "{k:p}" next rec 'vpost
+    in (tell("<366|hectordavid1228>blablabla") || unless "{k:366}" v "{k:all}"
+    v "{k:p}" next v('vpost)), 1) || s(unless "{k:366}" v "{k:all}" v "{k:p}"
+    next rec 'vpost in (tell("<366|hectordavid1228>hello, this is my wall") ||
+    unless "{k:366}" v "{k:all}" v "{k:p}" next v('vpost)), 1) ; empty[empty[
     empty-forest] : ("<365|hectordavid1228>hello world",
-    "{pid:365|hectordavid1228} post('hello world')")[empty-forest] :
-    empty-forest] >
+    "<366|hectordavid1228>blablabla",
+    "<366|hectordavid1228>hello, this is my wall",
+    "{pid:365|hectordavid1228} post('hello world')",
+    "{pid:366|hectordavid1228} post('blablabla')",
+    "{pid:366|hectordavid1228} post('hello, this is my wall')")[empty-forest] :
+    ("<366|frank.valencia>hello", "{pid:366|frank.valencia} post('hello')")[
+    empty-forest] : empty-forest] >
 Maude> Bye.
