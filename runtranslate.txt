@@ -1,1 +1,1 @@
-red in SCCP-RUN : ([post("<365|hectordavid1228>hello world") || repeat tell("{pid:{pid}|hectordavid1228} post('hello world')")] 1) . 
+red in SCCP-RUN : ([post("<366|hectordavid1228>hello, this is my wall") || repeat tell("{pid:{pid}|hectordavid1228} post('hello, this is my wall')")] 1) . 

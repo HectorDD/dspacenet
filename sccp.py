@@ -14,15 +14,14 @@ nameinput="run.txt"
 nameoutput="output.txt"
 namememory="memory.txt"
 nameprocess="process.txt"
-memoria=""
+memory=""
 procesos=""
 clock=0
 ntcctime=getNtccTime()
 
 def functionf():
     global procesos
-    global memoria
-    global semaforo
+    global memory
     archi = open("runf.txt","w")
     archi.write("red in NTCC-RUN : f("+procesos+ ") . \n")
     archi.close()
@@ -37,7 +36,6 @@ def functionf():
     if(notfound):
         stat=open("status.txt","w")
         stat.write("Error")
-        semaforo=True
         return jsonify({'result' : 'Error'})
         
     else:
@@ -71,7 +69,6 @@ def translateProcess(process):
     if(notfound):
         stat=open("status.txt","w")
         stat.write("Error")
-        semaforo=True
         return jsonify({'result' : 'Error'})
 
     else:
@@ -100,7 +97,6 @@ def addPid(program):
       program=program[:index]+pid+program[index+3:]
       oldindex=index+len(pid)
       index=program[oldindex:].find(pidstr)
-  print("ESTE ES EL PROGRAMA",program)
   return program
 
 def addPidPosted(program):
@@ -114,7 +110,6 @@ def addPidPosted(program):
       program=program[:index]+pid+program[index+5:]
       oldindex=index+len(pid)
       index=program[oldindex:].find(pidstr)
-  print("ESTE ES EL PROGRAMA",program)
   return program
 
 
@@ -168,24 +163,24 @@ def addIdandOrderSay(program,id_user):
 
 def extractInfo(msg):
     global clock
-    parseResult=parse('{}<{}>{}"',msg)
+    parseResult=parse('<{}>{}',msg)
     if parseResult is None :
         if msg.find("{pid") == -1:
-            r={'clock' : clock , 'user_msg' : "private" , 'msg' : msg[1:len(msg)-1] , 'class' : "system" }
+            r={'clock' : clock , 'user_msg' : "private" , 'msg' : msg , 'class' : "system" }
         else:
             msg=msg.replace("{","[")
             msg=msg.replace("}","]")
-            r={'clock' : clock , 'user_msg' : "private" , 'msg' : msg[2:len(msg)-1] , 'class' : "process" }
+            r={'clock' : clock , 'user_msg' : "private" , 'msg' : msg , 'class' : "process" }
     else :
-        info=parseResult[1]
-        message=parseResult[2]
+        info=parseResult[0]
+        message=parseResult[1]
         info=info.split("|")
         r={'clock' : info[0] , 'user_msg' : info[1] , 'msg' : message , 'class' : "none" }
     return r
 
 def extractInfoProcesses(msg):
     global clock
-    parseResult=parse('{}<{}>{}"',msg)
+    parseResult=parse('<{}>{}',msg)
     if parseResult is None :
 	if msg.find("{pid") == -1:
 	    r=False
@@ -202,15 +197,13 @@ def refreshState():
     mem = open(namememory,"r")
     proc = open(nameprocess,"r")
     global procesos
-    global memoria
+    global memory
     procesos = proc.readline()
-    memoria = mem.readline()
+    memory = mem.readline()
     mem.close()
     proc.close()
 
 refreshState()
-
-semaforo=True
 
 def elimOther(agents):
     stack=[]
@@ -254,6 +247,22 @@ def getCurrAgent(agents):
         if len(stack)==0:
             break
     return agents[:index]
+    
+def splitMessages(stringMessages):
+    messages=[]
+    oneMessage=""
+    stack=[]
+    for i in stringMessages:
+        if i=='"':
+            stack.append('"')
+        elif i=="," and len(stack)%2 == 0:
+            messages.append(oneMessage)
+            oneMessage=""
+        elif len(stack)%2 != 0:
+            oneMessage=oneMessage+i
+    messages.append(oneMessage)
+    print messages
+    return messages
         
 def convertMemInJson(mem):
     index=1
@@ -261,13 +270,13 @@ def convertMemInJson(mem):
     messages="error"
     memParse=parse("({})",mem)
     if memParse != None:
-        messages=memParse[0].split(",")
+        messages=splitMessages(memParse[0])
     else:
         messages=[mem]
     jMessages=[]
     for i in messages:
         jMessages.append(extractInfo(i))
-    
+    print jMessages
     return jMessages
 
 def convertProcessesInJson(mem):
@@ -276,19 +285,19 @@ def convertProcessesInJson(mem):
     messages="error"
     memParse=parse("({})",mem)
     if memParse != None:
-        messages=memParse[0].split(",")
+        messages=splitMessages(memParse[0])
     else:
         messages=[mem]
     jMessages=[]
     for i in messages:
-	element=extractInfoProcesses(i)
-	if element != False:
+        element=extractInfoProcesses(i)
+        if element != False:
             jMessages.append(i)
     return jMessages
 
 def calculateAgentMemory(agentId):
     refreshState()
-    parsingResult=parse("{}[{}]", memoria )
+    parsingResult=parse("{}[{}]", memory )
     agents=parsingResult[1]
 
     while agentId>0:
@@ -299,9 +308,9 @@ def calculateAgentMemory(agentId):
     return agents
 
 def calculateMessages(user_from,user_to):
-    global memoria
+    global memory
     refreshState()
-    parsingResult=parse("{}[{}]", memoria )
+    parsingResult=parse("{}[{}]", memory )
     if parsingResult is None :
         return False
     agents=parsingResult[1]
@@ -332,19 +341,17 @@ def calculateMessages(user_from,user_to):
 
 def saveState(result):
     global procesos
-    global memoria
-    global semaforo
+    global memory
     parsingResult=parse("result Conf: < {} ; {} >", result )
     procesos=parsingResult[0]
     functionf()
-    memoria=parsingResult[1]
+    memory=parsingResult[1]
     mem=open(namememory,"w")
-    mem.write(memoria)
+    mem.write(memory)
     mem.close()
     proc=open(nameprocess,"w")
     proc.write(procesos)
     proc.close()
-    semaforo=True
     
 def quitarSaltoLinea(resultado):
     nuevo=""
@@ -367,58 +374,51 @@ def index():
 def runsccp():
     global ntcctime
     ntcctime=getNtccTime()
-    global semaforo
-    if semaforo:   
-        global procesos
-        global memoria
-        refreshState()
-        recibido = request.json['config']
-        userp = request.json['user']
-        recibido = addIdandOrder(recibido,userp)
-	recibido = translateProcess(recibido)
-	recibido = addPid(recibido)
-        recibido = addPidPosted(recibido)
-        procesos = recibido +" || " + procesos
-        archi = open(nameinput,"w")
-        archi.write("rew in SCCP-RUN : < "+procesos+" ; empty[empty-forest] > . \n")
-        archi.close()
-        os.system('./Maude/maude.linux64 < run.txt > output.txt')
-        archi = open(nameoutput,"r")
-        notfound=True
-        r1=""
-        while(notfound and not("Bye." in r1) ):
-            r1=archi.readline()
-            if "result" in r1:
-                notfound=False
-        if(notfound):
-            stat=open("status.txt","w")
-            stat.write("Error")
-            semaforo=True
-	    print "this is an error"
-            return jsonify({'result' : 'Error'})
+    global procesos
+    global memory
+    refreshState()
+    recibido = request.json['config']
+    userp = request.json['user']
+    recibido = addIdandOrder(recibido,userp)
+    recibido = translateProcess(recibido)
+    recibido = addPid(recibido)
+    recibido = addPidPosted(recibido)
+    procesos = recibido +" || " + procesos
+    archi = open(nameinput,"w")
+    archi.write("rew in SCCP-RUN : < "+procesos+" ; empty[empty-forest] > . \n")
+    archi.close()
+    os.system('./Maude/maude.linux64 < run.txt > output.txt')
+    archi = open(nameoutput,"r")
+    notfound=True
+    r1=""
+    while(notfound and not("Bye." in r1) ):
+        r1=archi.readline()
+        if "result" in r1:
+            notfound=False
             
-        else:
-            resultado=r1
-            notend=True
-            while(notend):
-                r1=archi.readline()
-                if "Bye." in r1:
-                    notend=False
-                else:
-                    resultado= resultado + r1[3:]
-
-            
-            resultado=quitarSaltoLinea(resultado)
-
-            if(resultado[0]=="r"):
-                saveState(resultado)
-                functionf()
-		ntccTictac(ntcctime)
-            return jsonify({'result' : 'ok'})
-    else:
-        return jsonify({'result' : 'bussy'})
-
+    if(notfound):
+        stat=open("status.txt","w")
+        stat.write("Error")
+        return jsonify({'result' : 'Error'})
     
+    else:
+        resultado=r1
+        notend=True
+        while(notend):
+            r1=archi.readline()
+            if "Bye." in r1:
+                notend=False
+            else:
+                resultado= resultado + r1[3:]
+
+        resultado=quitarSaltoLinea(resultado)
+
+        if(resultado[0]=="r"):
+            saveState(resultado)
+            functionf()
+            return jsonify({'result' : 'ok'})
+	ntccTictac(ntcctime)
+	
 @app.route('/getFriendMem', methods=['POST'])
 def getFriendMem():
     agent=int(request.json['id'])
@@ -436,8 +436,8 @@ def getMyMem():
     
 @app.route('/getGlobal', methods=['GET'])
 def getGlobal():
-    global memoria
-    answer=getCurrAgent(memoria)
+    global memory
+    answer=getCurrAgent(memory)
     parsingResult=parse("{}[{}]", answer )
     if parsingResult[0] is None:
         return jsonify({'result' : 'lala'})

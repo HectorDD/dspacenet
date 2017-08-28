@@ -3,13 +3,15 @@
 		     /||||||||||||||||||\
 	   Maude 2.7.1 built: Jun 27 2016 16:35:16
 	    Copyright 1997-2016 SRI International
-		   Fri Aug 25 08:47:45 2017
+		   Mon Aug 28 20:13:28 2017
 Maude> ==========================================
-reduce in SCCP-RUN : [post("<365|hectordavid1228>hello world") || repeat tell(
-    "{pid:{pid}|hectordavid1228} post('hello world')")]1 .
+reduce in SCCP-RUN : [post("<366|hectordavid1228>hello, this is my wall") ||
+    repeat tell("{pid:{pid}|hectordavid1228} post('hello, this is my wall')")]1
+    .
 rewrites: 11 in 0ms cpu (0ms real) (~ rewrites/second)
-result SpaInstruc: s(rec 'vpost in (tell("<365|hectordavid1228>hello world") ||
-    unless "{k:all}" v "{k:pid}" v "{k:p}" next v('vpost)), 1) || s(rec 'vrep
-    in (tell("{pid:{pid}|hectordavid1228} post('hello world')") || unless
+result SpaInstruc: s(rec 'vpost in (tell(
+    "<366|hectordavid1228>hello, this is my wall") || unless "{k:all}" v
+    "{k:pid}" v "{k:p}" next v('vpost)), 1) || s(rec 'vrep in (tell(
+    "{pid:{pid}|hectordavid1228} post('hello, this is my wall')") || unless
     "{k:all}" v "{k:pid}" next v('vrep)), 1)
 Maude> Bye.
