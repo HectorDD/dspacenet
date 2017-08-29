@@ -1,5 +1,7 @@
 0 info it worked if it ends with ok
-1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'start' ]
+1 verbose cli [ '/home/ubuntu/.nvm/versions/node/v4.7.3/bin/node',
+1 verbose cli   '/home/ubuntu/.nvm/versions/node/v4.7.3/bin/npm',
+1 verbose cli   'start' ]
 2 info using npm@2.15.11
 3 info using node@v4.7.3
 4 verbose run-script [ 'prestart', 'start', 'poststart' ]
@@ -9,18 +11,18 @@
 8 info workspace@0.0.0 Failed to exec start script
 9 verbose stack Error: workspace@0.0.0 start: `node ./bin/www`
 9 verbose stack Exit status 1
-9 verbose stack     at EventEmitter.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/lifecycle.js:217:16)
+9 verbose stack     at EventEmitter.<anonymous> (/home/ubuntu/.nvm/versions/node/v4.7.3/lib/node_modules/npm/lib/utils/lifecycle.js:217:16)
 9 verbose stack     at emitTwo (events.js:87:13)
 9 verbose stack     at EventEmitter.emit (events.js:172:7)
-9 verbose stack     at ChildProcess.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/spawn.js:24:14)
+9 verbose stack     at ChildProcess.<anonymous> (/home/ubuntu/.nvm/versions/node/v4.7.3/lib/node_modules/npm/lib/utils/spawn.js:24:14)
 9 verbose stack     at emitTwo (events.js:87:13)
 9 verbose stack     at ChildProcess.emit (events.js:172:7)
 9 verbose stack     at maybeClose (internal/child_process.js:854:16)
 9 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:222:5)
 10 verbose pkgid workspace@0.0.0
-11 verbose cwd /home/dspacenet/dspacenet
-12 error Linux 4.4.0-62-generic
-13 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "start"
+11 verbose cwd /home/ubuntu/dspacenet
+12 error Linux 4.9.17-c9
+13 error argv "/home/ubuntu/.nvm/versions/node/v4.7.3/bin/node" "/home/ubuntu/.nvm/versions/node/v4.7.3/bin/npm" "start"
 14 error node v4.7.3
 15 error npm  v2.15.11
 16 error code ELIFECYCLE
