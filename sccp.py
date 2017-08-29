@@ -1,27 +1,20 @@
 from flask import Flask, jsonify, request
 from parse import * 
 
-<<<<<<< HEAD
-##Structure of messages: "(clock,id_user)message"
-systemfiles="~systemfiles/"
-=======
+
 ##Structure of messages: "<clock,id_user>message"
 ##System files are located inside the following directory
 systemfiles="~systemfiles/"
 
 #This function get the ntcc time counter, it's stored in a txt file
->>>>>>> 8dfb5e3e405dc61a9af0824f1f3a2490da02c9e5
 def getNtccTime():
     cl=open(systemfiles+"ntcctime.txt","r")
     time=cl.readline()
     cl.close()
     return int(time)
 
-<<<<<<< HEAD
 
-=======
 ##Definition of some global variables
->>>>>>> 8dfb5e3e405dc61a9af0824f1f3a2490da02c9e5
 nameinput=systemfiles+"run.txt"
 nameoutput=systemfiles+"output.txt"
 namememory=systemfiles+"memory.txt"
@@ -51,11 +44,7 @@ def functionf():
     global processes
     global memory
     archi = open(systemfiles+"runf.txt","w")
-<<<<<<< HEAD
-    archi.write("red in NTCC-RUN : f("+procesos+ ") . \n")
-=======
     archi.write("red in NTCC-RUN : f("+processes+ ") . \n")
->>>>>>> 8dfb5e3e405dc61a9af0824f1f3a2490da02c9e5
     archi.close()
     os.system('./Maude/maude.linux64 < '+systemfiles+'runf.txt > '+systemfiles+'outputf.txt')
     archi = open(systemfiles+"outputf.txt","r")
@@ -143,22 +132,7 @@ def addPidPosted(program):
       index=program[oldindex:].find(pidstr)
   return program
 
-<<<<<<< HEAD
-
-
-def tictac(c):
-    cl=open(systemfiles+"clock.txt","w")
-    stwrite=str(c+1)
-    cl.write(stwrite)
-    cl.close()
-def getClock():
-    cl=open(systemfiles+"clock.txt","r")
-    clock=cl.readline()
-    cl.close()
-    return int(clock)
-=======
 ##Function that increase the ntcc time counter
->>>>>>> 8dfb5e3e405dc61a9af0824f1f3a2490da02c9e5
 def ntccTictac(c):
     cl=open(systemfiles+"ntcctime.txt","w")
     stwrite=str(c+1)
@@ -292,20 +266,6 @@ def getCurrAgent(agents):
 ##return: ['message 1', 'message 2', 'message 3' ...]
 def splitMessages(stringMessages): 
     messages=[]
-<<<<<<< HEAD
-    oneMessage=""
-    stack=[]
-    for i in stringMessages:
-        if i=='"':
-            stack.append('"')
-        elif i=="," and len(stack)%2 == 0:
-            messages.append(oneMessage)
-            oneMessage=""
-        elif len(stack)%2 != 0:
-            oneMessage=oneMessage+i
-    messages.append(oneMessage)
-
-=======
     message=""
     quotecounter=0
     for c in stringMessages:
@@ -317,7 +277,6 @@ def splitMessages(stringMessages):
         elif quotecounter%2 != 0:
             message=message+c
     messages.append(message)
->>>>>>> 8dfb5e3e405dc61a9af0824f1f3a2490da02c9e5
     return messages
 
 ##Function that convert the agent memory in a json list with every message with their information
@@ -333,10 +292,7 @@ def convertMemInJson(mem):
     jMessages=[]
     for i in messages:
         jMessages.append(extractInfo(i))
-<<<<<<< HEAD
 
-=======
->>>>>>> 8dfb5e3e405dc61a9af0824f1f3a2490da02c9e5
     return jMessages
     
 ##Function that convert the agent memory in a json list with every information of processes stored on the memory
@@ -488,25 +444,6 @@ def runsccp():
             functionf()
             ntccTictac(ntcctime)
             return jsonify({'result' : 'ok'})
-<<<<<<< HEAD
-	
-	
-@app.route('/getFriendMem', methods=['POST'])
-def getFriendMem():
-    agent=int(request.json['id'])
-    answer=calculateAgentMemory(agent)
-    paranswer=parse("{}[{}]{}", answer )
-    ranswer=paranswer[0]
-
-    return jsonify({'result' : ranswer})
-
-@app.route('/getMyMem', methods=['POST'])
-def getMyMem():
-    agent=int(request.json['id'])
-    answer=calculateAgentMemory(agent)
-    return jsonify({'result' : answer})
-=======
->>>>>>> 8dfb5e3e405dc61a9af0824f1f3a2490da02c9e5
     
 ##This function returns the global memory
 @app.route('/getGlobal', methods=['GET'])
