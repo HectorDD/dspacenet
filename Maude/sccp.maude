@@ -25,7 +25,7 @@ mod STRING-PATTERN is
  op _&_ : Pattern Pattern -> Pattern [ctor  assoc comm prec 30] .
  op [_]* : Pattern -> Pattern [ctor] .
  op (_|_) : String Pattern -> Comp [ctor] . 
- op header :  -> Pattern .
+ 
  op number :  -> Pattern .
  
  vars  P P' Q Q' R : Pattern .
@@ -102,7 +102,7 @@ crl [and]:
   ( S | [ P ]* )  =>  ( S |  P . [ P ]*  ) .
 
  eq number = [ "0" v "1" v "2" v "3" v "4" v "5" v "6" v "7" v "8" v "9" ]* .
- eq header = "<" .  *   .
+
 
 
 endm
@@ -169,14 +169,19 @@ mod CLOUD is
  var C : Cloud .
  vars N1 NC1 : Int .
  var i : Nat . 
-
+ 
+ ---NF: New Forest, OF: Old Forest
  ---Auxiliar functions
  eq withoutlast(t : empty-forest) = empty-forest .
  eq withoutlast(t : T) = t : withoutlast(T) .
  eq lastelement(t : empty-forest) = t .
  eq lastelement(t : T) = lastelement(T) . 
+ 
+ ---(mergeforest: merges two forests. Note: efficiency can be improved; the forest is traversed twice.)
  eq mergeforest(empty-forest,NF) = NF .
  eq mergeforest(OF,NF) = mergeforest(withoutlast(OF),lastelement(OF) : NF) .
+ ---
+ 
  eq expandforest(OF,NF,0) = mergeforest(OF,NF) .
  eq expandforest(OF,NF,s(N1)) = expandforest(OF,empty[empty-forest] : NF,N1) .
  ceq howmanychildren(N1,NC1) = 0 if NC1 > N1 . 
@@ -357,11 +362,12 @@ mod SCCP is
 endm
 --------
 
- ---Derived Operators & User Language .
+ ---Derived Operators & User Language For Social Networking .
 
-mod SYNTAXMOD is
+mod SYNTAX4SOCIALNET is
  inc SCCP .
-
+ 
+ op header :  -> Pattern .
  op enter_do_ : Nat SpaInstruc -> SpaInstruc [ctor prec 30] .
  op exit_do_ : Nat SpaInstruc -> SpaInstruc [ctor prec 30] .
  op _@_ : SpaInstruc Nat -> SpaInstruc [ctor prec 30] .
@@ -386,7 +392,6 @@ mod SYNTAXMOD is
  vars P P' Q : SpaInstruc .
  var i : Nat .
  vars c pid : Const .
- 
   
  eq [P]i = s(P,i) .
  eq xtr(P,i) = x(P,i) .
@@ -395,6 +400,7 @@ mod SYNTAXMOD is
  eq P @ i = s(P,i) . 
  eq P ^ i = x(P,i ) .
 
+ eq header = "<" .  *   .
  
  eq kill-all  = "{k:all}" .
  eq kill-posts = "{k:p}" . 
@@ -402,13 +408,10 @@ mod SYNTAXMOD is
  eq kill-proc-cond = kill-pid v kill-all .
  eq kill-pid = "{k:pid}" .
 
-
- 
  ceq kill(c) = tell(kill-all) if c = "all" .
  ceq kill(c) = tell(kill-posts) if c = "posts" . 
  ceq kill(c) = tell("{k:" + c + "}") if c =/= "all" /\ c =/= "posts" .
  
-
  eq post(c)  = rec 'vpost in ( tell(c) || 
                     unless kill-post-cond next v('vpost) ) .
  
@@ -455,7 +458,7 @@ endm
 
 
 mod SCCP-RUN is
-  pr SYNTAXMOD .
+  pr SYNTAX4SOCIALNET .
   
 endm
 
