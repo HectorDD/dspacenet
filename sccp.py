@@ -2,18 +2,18 @@ from flask import Flask, jsonify, request
 from parse import * 
 
 ##Structure of messages: "(clock,id_user)message"
-
+systemfiles="~systemfiles/"
 def getNtccTime():
-    cl=open("ntcctime.txt","r")
+    cl=open(systemfiles+"ntcctime.txt","r")
     time=cl.readline()
     cl.close()
     return int(time)
 
 
-nameinput="run.txt"
-nameoutput="output.txt"
-namememory="memory.txt"
-nameprocess="process.txt"
+nameinput=systemfiles+"run.txt"
+nameoutput=systemfiles+"output.txt"
+namememory=systemfiles+"memory.txt"
+nameprocess=systemfiles+"process.txt"
 memory=""
 procesos=""
 clock=0
@@ -22,11 +22,11 @@ ntcctime=getNtccTime()
 def functionf():
     global procesos
     global memory
-    archi = open("runf.txt","w")
+    archi = open(systemfiles+"runf.txt","w")
     archi.write("red in NTCC-RUN : f("+procesos+ ") . \n")
     archi.close()
-    os.system('./Maude/maude.linux64 < runf.txt > outputf.txt')
-    archi = open("outputf.txt","r")
+    os.system('./Maude/maude.linux64 < '+systemfiles+'runf.txt > '+systemfiles+'outputf.txt')
+    archi = open(systemfiles+"outputf.txt","r")
     notfound=True
     r1=""
     while(notfound and not("Bye." in r1) ):
@@ -34,7 +34,7 @@ def functionf():
         if "result" in r1:
             notfound=False
     if(notfound):
-        stat=open("status.txt","w")
+        stat=open(systemfiles+"status.txt","w")
         stat.write("Error")
         return jsonify({'result' : 'Error'})
         
@@ -55,11 +55,11 @@ def functionf():
 ##Function for translating the input process to machine language
 
 def translateProcess(process):
-    file = open("runtranslate.txt","w")
+    file = open(systemfiles+"runtranslate.txt","w")
     file.write("red in SCCP-RUN : "+process+" . \n")
     file.close()
-    os.system('./Maude/maude.linux64 < runtranslate.txt > outputtranslate.txt')
-    archi = open("outputtranslate.txt","r")
+    os.system('./Maude/maude.linux64 < '+systemfiles+'runtranslate.txt > '+systemfiles+'outputtranslate.txt')
+    archi = open(systemfiles+"outputtranslate.txt","r")
     notfound=True
     r1=""
     while(notfound and not("Bye." in r1) ):
@@ -67,7 +67,7 @@ def translateProcess(process):
         if "result" in r1:
             notfound=False
     if(notfound):
-        stat=open("status.txt","w")
+        stat=open(systemfiles+"status.txt","w")
         stat.write("Error")
         return jsonify({'result' : 'Error'})
 
@@ -115,17 +115,17 @@ def addPidPosted(program):
 
 
 def tictac(c):
-    cl=open("clock.txt","w")
+    cl=open(systemfiles+"clock.txt","w")
     stwrite=str(c+1)
     cl.write(stwrite)
     cl.close()
 def getClock():
-    cl=open("clock.txt","r")
+    cl=open(systemfiles+"clock.txt","r")
     clock=cl.readline()
     cl.close()
     return int(clock)
 def ntccTictac(c):
-    cl=open("ntcctime.txt","w")
+    cl=open(systemfiles+"ntcctime.txt","w")
     stwrite=str(c+1)
     cl.write(stwrite)
     cl.close()
@@ -261,7 +261,7 @@ def splitMessages(stringMessages):
         elif len(stack)%2 != 0:
             oneMessage=oneMessage+i
     messages.append(oneMessage)
-    print messages
+
     return messages
         
 def convertMemInJson(mem):
@@ -276,7 +276,7 @@ def convertMemInJson(mem):
     jMessages=[]
     for i in messages:
         jMessages.append(extractInfo(i))
-    print jMessages
+
     return jMessages
 
 def convertProcessesInJson(mem):
@@ -387,7 +387,7 @@ def runsccp():
     archi = open(nameinput,"w")
     archi.write("rew in SCCP-RUN : < "+procesos+" ; empty[empty-forest] > . \n")
     archi.close()
-    os.system('./Maude/maude.linux64 < run.txt > output.txt')
+    os.system('./Maude/maude.linux64 < '+systemfiles+'run.txt > '+systemfiles+'output.txt')
     archi = open(nameoutput,"r")
     notfound=True
     r1=""
@@ -397,7 +397,7 @@ def runsccp():
             notfound=False
             
     if(notfound):
-        stat=open("status.txt","w")
+        stat=open(systemfiles+"status.txt","w")
         stat.write("Error")
         return jsonify({'result' : 'Error'})
     
@@ -416,8 +416,9 @@ def runsccp():
         if(resultado[0]=="r"):
             saveState(resultado)
             functionf()
+            ntccTictac(ntcctime)
             return jsonify({'result' : 'ok'})
-	ntccTictac(ntcctime)
+	
 	
 @app.route('/getFriendMem', methods=['POST'])
 def getFriendMem():
@@ -474,13 +475,13 @@ def getMsg():
         sender=[]
     else : 
         sender=convertMemInJson(sender)
-        print sender
+
     receiver=calculateMessages(user_to,user_from)
     if not receiver :
         receiver=[]
     else : 
         receiver=convertMemInJson(receiver)
-        print receiver
+
     result=sender+receiver
     result.sort(key=lambda clock: int(clock['clock']),reverse=False)
     return jsonify({'messages_to' : result , 'messages_from' : receiver})
