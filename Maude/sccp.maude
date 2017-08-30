@@ -374,6 +374,7 @@ mod SYNTAX4SOCIALNET is
  op _^_ : SpaInstruc Nat -> SpaInstruc [ctor prec 30] . 
  op [_]_ : SpaInstruc Nat -> SpaInstruc .
  op xtr : SpaInstruc Nat -> SpaInstruc .
+ op call(_) : Qid -> SpaInstruc [ctor] .
  op post(_) : Const -> SpaInstruc [strat (0) prec 30] . 
  op repeat_ : SpaInstruc -> SpaInstruc [strat (0) prec 30] .
  op whenever_do_ : Const SpaInstruc -> SpaInstruc [prec 30] .
@@ -392,7 +393,7 @@ mod SYNTAX4SOCIALNET is
  vars P P' Q : SpaInstruc .
  var i : Nat .
  vars c pid : Const .
-  
+ var X : Qid . 
  eq [P]i = s(P,i) .
  eq xtr(P,i) = x(P,i) .
  eq enter i do P = s(P,i) .
@@ -401,7 +402,7 @@ mod SYNTAX4SOCIALNET is
  eq P ^ i = x(P,i ) .
 
  eq header = "<" .  *   .
- 
+
  eq kill-all  = "{k:all}" .
  eq kill-posts = "{k:p}" . 
  eq kill-post-cond = kill-pid v kill-all v kill-posts .
@@ -415,6 +416,7 @@ mod SYNTAX4SOCIALNET is
  eq post(c)  = rec 'vpost in ( tell(c) || 
                     unless kill-post-cond next v('vpost) ) .
  
+
  eq repeat repeat P = repeat P . 
  eq repeat ( P ||  Q) = repeat P || repeat Q .
 
@@ -430,6 +432,8 @@ mod SYNTAX4SOCIALNET is
  eq now c then P else Q =  (ask header . c then  unless kill-proc-cond next P) || (unless ( (header . c) v kill-proc-cond) next Q) .
 
  eq say(c) = tell(c) . 
+
+ eq call(X) = unless kill-proc-cond next v(X) .
 endm
 
 mod NTCC is
