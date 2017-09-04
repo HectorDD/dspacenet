@@ -437,7 +437,6 @@ mod SYNTAX4SOCIALNET is
 endm
 
 
-(--- the future function f: determines the process to be executed in the next time unit )
 mod NTCC is
  inc SCCP-SYMBOLS .
 
@@ -461,7 +460,6 @@ mod NTCC is
  
 
 endm
-
 
 mod SCCP-RUN is
   pr SYNTAX4SOCIALNET .

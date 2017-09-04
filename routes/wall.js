@@ -106,7 +106,7 @@ router.post('/post' , function(req, res, next) {
  client.post(url+"/runsccp", argsPost , function (data, response) {
      var r = data.result;
      console.log(r);
-     if(r!="Ok"){
+     if(r!="ok"){
         req.session.var_err="1";
         res.redirect('../wall');
         console.log("error");

@@ -67,7 +67,7 @@ router.post('/:id1/post' , function(req, res, next) {
  console.log(argsPost);
  client.post(url+"/runsccp", argsPost , function (data, response) {
      var r = data.result;
-     if(r!="Ok"){
+     if(r!="ok"){
         req.session.var_err="1";
      }
      res.redirect('../'.concat(id_user));

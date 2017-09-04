@@ -29,13 +29,10 @@ def erraseSpacePostAndSay(program,searchingString):
     oldindex=0
     while index != -1 :
         index=index+oldindex+4
-        print index
         while program[index] == " ":
             program=program[:index] + program[index+1:]
         oldindex=index
-        print("old",oldindex)
         index=program[index:].find(searchingString)
-        print("index",index)
     return program
 
 ##Definition of the function f for ntcc, it sends the residual process from sccp 
@@ -75,7 +72,9 @@ def functionf():
 ##Function for translating the input process to machine language
 def translateProcess(process):
     file = open(systemfiles+"runtranslate.txt","w")
-    file.write("red in SCCP-RUN : "+process+" . \n")
+    strtowrite="red in SCCP-RUN : "+process+" . \n"
+    print strtowrite
+    file.write(strtowrite)
     file.close()
     os.system('./Maude/maude.linux64 < '+systemfiles+'runtranslate.txt > '+systemfiles+'outputtranslate.txt')
     archi = open(systemfiles+"outputtranslate.txt","r")
@@ -403,10 +402,13 @@ def runsccp():
     refreshState()
     recibido = request.json['config']
     userp = request.json['user']
+    
     recibido = erraseSpacePostAndSay(recibido,"post")
     recibido = erraseSpacePostAndSay(recibido,"say")
     recibido = addIdandOrder(recibido,userp)
-    recibido = translateProcess(recibido)
+    print "hello="+recibido
+    receivedstr=str(recibido)
+    recibido = translateProcess(receivedstr)
     recibido = addPid(recibido)
     recibido = addPidPosted(recibido)
     processes = recibido +" || " + processes
@@ -426,7 +428,6 @@ def runsccp():
         stat=open(systemfiles+"status.txt","w")
         stat.write("Error")
         return jsonify({'result' : 'Error'})
-    
     else:
         resultvar=r1
         notend=True
