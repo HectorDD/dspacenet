@@ -436,6 +436,8 @@ mod SYNTAX4SOCIALNET is
  eq call(X) = unless kill-proc-cond next v(X) .
 endm
 
+
+(--- the future function f: determines the process to be executed in the next time unit )
 mod NTCC is
  inc SCCP-SYMBOLS .
 

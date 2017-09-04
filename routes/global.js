@@ -58,9 +58,9 @@ router.post('/post' , function(req, res, next) {
              };
  console.log(argsPost);
  client.post(url+"/runsccp", argsPost , function (data, response) {
-     r = data.result;
+     var r = data.result;
      console.log(r);
-     if(r=="Error"){
+     if(r!="Ok"){
         req.session.var_err="1";
         res.redirect('../global');
         console.log("un error");

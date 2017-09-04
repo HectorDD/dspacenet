@@ -104,12 +104,12 @@ router.post('/post' , function(req, res, next) {
              };
  console.log(argsPost);
  client.post(url+"/runsccp", argsPost , function (data, response) {
-     r = data.result;
+     var r = data.result;
      console.log(r);
-     if(r=="Error"){
+     if(r!="Ok"){
         req.session.var_err="1";
         res.redirect('../wall');
-        console.log("un error");
+        console.log("error");
      }
      else{
         res.redirect('../wall');  
