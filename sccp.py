@@ -73,7 +73,6 @@ def functionf():
 def translateProcess(process):
     file = open(systemfiles+"runtranslate.txt","w")
     strtowrite="red in SCCP-RUN : "+process+" . \n"
-    print strtowrite
     file.write(strtowrite)
     file.close()
     os.system('./Maude/maude.linux64 < '+systemfiles+'runtranslate.txt > '+systemfiles+'outputtranslate.txt')
@@ -406,7 +405,6 @@ def runsccp():
     recibido = erraseSpacePostAndSay(recibido,"post")
     recibido = erraseSpacePostAndSay(recibido,"say")
     recibido = addIdandOrder(recibido,userp)
-    print "hello="+recibido
     receivedstr=str(recibido)
     recibido = translateProcess(receivedstr)
     recibido = addPid(recibido)
