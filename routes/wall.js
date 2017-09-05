@@ -48,7 +48,6 @@ router.get('/' , function(req, res, next) {
                 data: { "id": req.session.id_user },
                 headers: { "Content-Type": "application/json" }
               };
-     console.log(argsPost);
      client.post(url+"/getWall", argsPost , function (data, response) {
         mem = data.result;
         db_users.getFriends(req.session.id_user, function(rows,fields){
@@ -60,7 +59,6 @@ router.get('/' , function(req, res, next) {
                      'user_from' : req.session.id_user },
                      headers: { "Content-Type": "application/json" }
                    };
-            console.log(argsPost);
             client.post(url+"/getMsg", argsPost , function (data, response) {
                var mf = data.messages_from;
                var mt = data.messages_to; 
@@ -70,7 +68,6 @@ router.get('/' , function(req, res, next) {
          
          }
           else{
-           console.log(req.session.user)
            res.render('wall',{ id_user: req.session.id_user , error : req.session.var_err , user : req.session.user, user_messages : req.session.user_messages , friends : myFriends , memoria : mem });
            req.session.var_err="0";          
               
@@ -94,7 +91,6 @@ router.post('/post' , function(req, res, next) {
  var program = req.body.config;
  if(program != "skip"){
  var programcopy = program.replace(/"/g,"'");
- console.log(programcopy);
  program = program + ' || repeat tell("{pid:{pid}|'.concat(user.concat('} '.concat(programcopy.concat('")'))))
  } 
  var fprog = "([".concat(program.concat("] ".concat(id_user.concat(")"))));
@@ -102,16 +98,15 @@ router.post('/post' , function(req, res, next) {
              data: { "config": fprog , "user": user},
              headers: { "Content-Type": "application/json" }
              };
- console.log(argsPost);
  client.post(url+"/runsccp", argsPost , function (data, response) {
      var r = data.result;
-     console.log(r);
-     if(r!="ok"){
+     console.log("Result: "+r);
+     if(r=="error"){
         req.session.var_err="1";
         res.redirect('../wall');
-        console.log("error");
      }
      else{
+        req.session.var_err="0";
         res.redirect('../wall');  
      }
      

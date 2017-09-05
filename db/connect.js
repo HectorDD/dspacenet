@@ -2,8 +2,6 @@ var mysql = require('mysql');
 var exports = module.exports = {};
 var u = require("./../config.js").dbuser;
 var p = require("./../config.js").dbpassword;
-console.log(u);
-console.log("bla");
 
 var pool  = mysql.createPool({
     host     : 'localhost',

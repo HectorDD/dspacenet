@@ -40,7 +40,6 @@ router.get('/' , function(req, res, next) {
     client.get(url+"/getGlobal", function (data, response) {
     // parsed response body as js object 
     var r=data.result;
-    console.log(r);
     res.render('global',{ memoria : r , id_user: req.session.id_user , error : req.session.var_err , user : req.session.user, user_messages : req.session.user_messages });
 
     });
@@ -56,20 +55,17 @@ router.post('/post' , function(req, res, next) {
              data: { "config": fprog , "user": user},
              headers: { "Content-Type": "application/json" }
              };
- console.log(argsPost);
  client.post(url+"/runsccp", argsPost , function (data, response) {
      var r = data.result;
-     console.log(r);
-     if(r!="ok"){
+     console.log("Result: "+r);
+     if(r=="error"){
         req.session.var_err="1";
         res.redirect('../global');
-        console.log("un error");
      }
      else{
+        req.session.var_err="0";
         res.redirect('../global');  
      }
-     
-     
   });
  
 });

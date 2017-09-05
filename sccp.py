@@ -75,7 +75,7 @@ def translateProcess(process):
     strtowrite="red in SCCP-RUN : "+process+" . \n"
     file.write(strtowrite)
     file.close()
-    os.system('./Maude/maude.linux64 < '+systemfiles+'runtranslate.txt > '+systemfiles+'outputtranslate.txt')
+    os.system('./Maude/maude.linux64 < '+systemfiles+'runtranslate.txt > '+systemfiles+'outputtranslate.txt 2>&1')
     archi = open(systemfiles+"outputtranslate.txt","r")
     notfound=True
     r1=""
@@ -83,11 +83,13 @@ def translateProcess(process):
         r1=archi.readline()
         if "result" in r1:
             notfound=False
+        elif "Warning:" in r1:
+            notfound=True
+            break
     if(notfound):
         stat=open(systemfiles+"status.txt","w")
         stat.write("Error")
-        return jsonify({'result' : 'Error'})
-
+        return "Error"
     else:
         resultvar=r1
         notend=True
@@ -401,19 +403,20 @@ def runsccp():
     refreshState()
     recibido = request.json['config']
     userp = request.json['user']
-    
     recibido = erraseSpacePostAndSay(recibido,"post")
     recibido = erraseSpacePostAndSay(recibido,"say")
     recibido = addIdandOrder(recibido,userp)
     receivedstr=str(recibido)
     recibido = translateProcess(receivedstr)
+    if recibido=="Error":
+        return jsonify({'result' : 'error'})
     recibido = addPid(recibido)
     recibido = addPidPosted(recibido)
     processes = recibido +" || " + processes
     archi = open(nameinput,"w")
     archi.write("rew in SCCP-RUN : < "+processes+" ; empty[empty-forest] > . \n")
     archi.close()
-    os.system('./Maude/maude.linux64 < '+systemfiles+'run.txt > '+systemfiles+'output.txt')
+    os.system('./Maude/maude.linux64 < '+systemfiles+'run.txt > '+systemfiles+'output.txt 2>&1')
     archi = open(nameoutput,"r")
     notfound=True
     r1=""
@@ -421,11 +424,12 @@ def runsccp():
         r1=archi.readline()
         if "result" in r1:
             notfound=False
-            
+        elif "Warning" in r1:
+            return jsonify({'result' : 'error'})
     if(notfound):
         stat=open(systemfiles+"status.txt","w")
         stat.write("Error")
-        return jsonify({'result' : 'Error'})
+        return jsonify({'result' : 'error'})
     else:
         resultvar=r1
         notend=True

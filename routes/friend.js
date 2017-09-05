@@ -15,7 +15,6 @@ router.get('/:id' , function(req, res, next) {
                 data: { "id": req.params.id },
                 headers: { "Content-Type": "application/json" }
               };
-    console.log(argsPost);
     client.post(url+"/getWall", argsPost , function (data, response) {
         mem = data.result;
         //res.render('friend',{user : req.session.user ,memoria : r});
@@ -31,7 +30,6 @@ router.get('/:id' , function(req, res, next) {
                      'user_from' : req.session.id_user },
                      headers: { "Content-Type": "application/json" }
                    };
-               console.log(argsPost);
                client.post(url+"/getMsg", argsPost , function (data, response) {
                var mf = data.messages_from;
                var mt = data.messages_to; 
@@ -55,7 +53,6 @@ router.post('/:id1/post' , function(req, res, next) {
  var program = req.body.config;
  if(program != "skip"){
  var programcopy = program.replace(/"/g,"'");
- console.log(programcopy);
  program = program + ' || repeat tell("{pid:{pid}|'.concat(user_post.concat('} '.concat(programcopy.concat('")'))))
  }
 
@@ -64,14 +61,16 @@ router.post('/:id1/post' , function(req, res, next) {
              data: { "config": fprog , "user" : user_post },
              headers: { "Content-Type": "application/json" }
              };
- console.log(argsPost);
  client.post(url+"/runsccp", argsPost , function (data, response) {
      var r = data.result;
-     if(r!="ok"){
+     if(r=="error"){
         req.session.var_err="1";
      }
+     else{
+        req.session.var_err="0";
+     }
      res.redirect('../'.concat(id_user));
-     console.log(r);
+     console.log("Result: "+r);
   });
  
 

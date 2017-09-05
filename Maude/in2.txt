@@ -1,1 +1,1 @@
-rew in STRING-PATTERN : ("ab" | ? . ?) .
+rew in SCCP-RUN : blabla .
