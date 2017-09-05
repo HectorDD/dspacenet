@@ -211,8 +211,11 @@
         
         
         
-      });  
-      
+      });
+      $('#programform').submit(function(){
+        $('#nocache').val(Math.random());
+        return true;
+      });
       
       var err = getUrlVars()["error"];
       if(err=="1"){

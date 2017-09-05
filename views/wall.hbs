@@ -106,16 +106,17 @@
       </p>
 
       <div id="wallmessage">
-      <form action="/wall/post" method="post">
+      <form action="/wall/post" method="post" id="programform">
       <input class="form-control" type="text" name="config" id="config" ></input>
       <br/>
       <input type="submit" class="btn btn-primary" id="runsccp" value="Post"> 
       <input type="button" class="btn btn-warning" id="clean" value="clear">
       <input type="button" class="btn btn-warning" id="skip" value="skip">
+      <input type="hidden" id="nocache">
       {{#ifCond error '==' '1'}}
-      <script type="text/javascript">
-        alert("Something went wrong.");
-      </script>
+      <div class="alert alert-warning">
+        <strong>Warning!</strong> Indicates a warning that might need attention.
+      </div>
       {{/ifCond}}
       </form>
       </div>
