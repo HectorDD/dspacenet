@@ -140,7 +140,24 @@ a {
 
 }
 
+input#config{
+  margin-bottom: 3px ;
+}
 
+input#nocache{
+  margin-bottom: 3px ;
+}
+
+#errormessage{
+  margin-top: 3px ;
+  border: 1px solid transparent;
+  padding: 5px;
+  border-radius: 4px;
+  float: right;
+  width:50%;
+  text-align:center;
+  
+}
 
 #footer {
   padding:15px;
@@ -206,8 +223,11 @@ div#onemessageto{
 
 }
 
-#refreshsccp{
+div#refreshsccp{
   text-align:left;
+  margin-top:5px;
+  margin-bottom:5px;
+  
 }
 
 div#dmessages{

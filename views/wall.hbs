@@ -105,24 +105,22 @@
 -->
       </p>
 
-      <div id="wallmessage">
+      
       <form action="/wall/post" method="post" id="programform">
+      <div id="wallmessage">
       <input class="form-control" type="text" name="config" id="config" ></input>
-      <br/>
       <input type="submit" class="btn btn-primary" id="runsccp" value="Post"> 
       <input type="button" class="btn btn-warning" id="clean" value="clear">
       <input type="button" class="btn btn-warning" id="skip" value="skip">
       <input type="hidden" id="nocache">
       {{#ifCond error '==' '1'}}
-      <div class="alert alert-warning">
-        <strong>Warning!</strong> Indicates a warning that might need attention.
+      <div class="alert-danger" id="errormessage">
+        <strong>Warning!</strong> Something went wrong.
       </div>
       {{/ifCond}}
-      </form>
       </div>
-      <br/>
       <div id="refreshsccp"><input type="button" class="btn btn-success" id="refreshsccp" value="Refresh" /></div>
-      <br/>
+      </form>
       {{#each memoria}}
         {{#ifCond this.user_msg '!=' 'private'}}
 	<div id="wallmessage">

@@ -103,25 +103,23 @@
       <input type="button" class="btn" id="vx" value="v('x)" />
       -->
       </p>
-
-      <div id="wallmessage">
+      
       <form action="/friend/{{id_friend}}/post" method="post">
+      <div id="wallmessage">
       <input class="form-control" type="text" name="config" id="config" ></input>
-      <br/>
-      <input type="submit" class="btn btn-primary" id="runsccp" value="Post" /> 
-      <input type="button" class="btn btn-warning" id="clean" value="clear" />
+      <input type="submit" class="btn btn-primary" id="runsccp" value="Post"> 
+      <input type="button" class="btn btn-warning" id="clean" value="clear">
       <input type="button" class="btn btn-warning" id="skip" value="skip">
+      <input type="hidden" id="nocache">
       {{#ifCond error '==' '1'}}
-      <script type="text/javascript">
-        alert("Something went wrong.");
-      </script>
-      {{/ifCond}}
-      <br/>
-      </form>
+      <div class="alert-danger" id="errormessage">
+        <strong>Warning!</strong> Something went wrong.
       </div>
-      <br/>
+      {{/ifCond}}
+      </div>
       <div id="refreshsccp"><input type="button" class="btn btn-success" id="refreshsccp" value="Refresh" /></div>
-      <br/>
+      </form>
+
       {{#each memoria}}
         {{#ifCond this.user_msg '!=' 'private'}}
         <div id="wallmessage">
