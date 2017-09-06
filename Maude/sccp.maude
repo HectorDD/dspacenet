@@ -471,4 +471,26 @@ mod NTCC-RUN is
 
 endm
 
+mod U2N is
+ pr SPAINSTRUC .
+ op u2n : SpaInstruc -> SpaInstruc .
+ 
+ vars P Q : SpaInstruc .
+ var c : Const .
+ var i : Nat .
+ var x : Qid .
+ 
+ eq u2n(tell(c)) = tell(c) .
+ eq u2n(skip) = skip .
+ eq u2n(s(P,i)) = s(u2n(P),i) .
+ eq u2n(x(P,i)) = x(u2n(P),i) .
+ eq u2n(rec x in P) = rec x in u2n(P) .
+ eq u2n(ask c then P) = ask c then u2n(P) .
+ eq u2n(v(x)) = v(x) .
+ eq u2n(P || Q) = u2n(P) || u2n(Q) .
+ eq u2n(unless c next P) = next P . 
+ eq u2n(next P) = next P .
+
+endm
+
 
