@@ -247,7 +247,7 @@ mod SPAINSTRUC is
 
 --- Structural Rules ---
 
-eq  P || P = P .
+---eq  P || P = P .
 eq  P || skip = P . 
 eq  rec X in skip  = skip . 
  
@@ -258,11 +258,8 @@ eq  rec X in skip  = skip .
  eq s(x(P,i),i)  =  P .
    
  eq s(skip,i)  = skip .
-
  eq s(P || Q, i) = s(P, i) || s(Q, i) .
-
----eq  s(P, i) || s(Q, i) = s(P || Q, i) . 
-
+  
  eq x(skip,i) = skip .
 
  ------
@@ -287,9 +284,6 @@ mod SCCP is
  pr STRING-PATTERN .
  pr CONST .
  
- op f : SpaInstruc Cloud -> SpaInstruc .
- var c : Const . 
- 
  var C1 : ConstSet .
  var S1 : Const .
  
@@ -301,21 +295,13 @@ mod SCCP is
  var F : ForestConstSet .
  var X : Qid .
  
- eq f(unless c next P , CL) = P . 
---- eq f(P || Q , CL) = f(P , CL) || f(Q , CL) .
-
  ---Rules for Tell Operator
---- rl < tell(C) ; CL > =>
----< skip ; insertel(C,CL) > .
+ rl < tell(C) ; CL > =>
+ < skip ; insertel(C,CL) > .
  
---- rl < tell(C) || Q ; CL > =>
---- < skip || Q ; insertel(C,CL) > .
+ rl < tell(C) || Q ; CL > =>
+ < skip || Q ; insertel(C,CL) > .
  ------
-
----Equations for Tell Operator
-eq < tell(C) ; CL > = < skip ; insertel(C,CL) > .
-eq < tell(C) || Q ; CL > = < skip || Q ; insertel(C,CL) > .
-------
  
  
  ---Rules for Spatial instructions
@@ -359,6 +345,20 @@ eq < tell(C) || Q ; CL > = < skip || Q ; insertel(C,CL) > .
  if
  (S1 | C) => ("" | "") .
  ------
+
+ ---Rules for unless C do P
+  crl [Unless1] :
+  < unless C next P ; (S1 , C1)[F] > =>
+ < skip ; (S1 , C1)[F] >
+ if
+ (S1 | C) => ("" | "") .
+
+  crl [Unless2] :
+  < Q || unless C next P ; (S1 , C1)[F] > =>
+ < Q || skip ; (S1 , C1)[F] >
+ if
+ (S1 | C) => ("" | "") .
+ ---
 
 
 
@@ -406,9 +406,9 @@ mod SYNTAX4SOCIALNET is
 
  eq header = "<" .  *   .
 
- eq kill-all  = "{k:a}" .
+ eq kill-all  = "{k:all}" .
  eq kill-posts = "{k:p}" . 
- eq kill-post-cond = kill-pid v kill-all  .
+ eq kill-post-cond = kill-pid v kill-all v kill-posts .
  eq kill-proc-cond = kill-pid v kill-all .
  eq kill-pid = "{k:pid}" .
 
@@ -443,7 +443,7 @@ endm
 mod NTCC is
  inc SCCP-SYMBOLS .
 
- var S : ConstSet .
+ 
  var C : Const .
  var c : Const .
  var X : Qid .
@@ -465,112 +465,13 @@ eq f(x(P,i)) = x(f(P),i) .
 
 endm
 
-mod NTCCPLUS is
- inc SCCP-SYMBOLS . 
- pr STRING-PATTERN .
- op f : SpaInstruc Cloud -> SpaInstruc .
-  
- var F : ForestConstSet .
- var S : ConstSet .
- vars C c : Const .
- var X : Qid .
- vars P Q R : SpaInstruc .
- var i : Nat .
- var M : Cloud . 
-
- rl [par] :
-  f(P || Q , M) => f(P , M) || f(Q , M) .
- 
- rl [skip] :
-  f(skip , M) => skip .
- 
- rl [next] :
-  f(next P , M) => P .
- 
- rl [tell] :
-  f(tell(c) , M) => skip .
- 
- rl [ask] :
-  f(ask c then P , M) => skip .
- 
- rl [rec] :
-  f(rec X in P , M) => rec X in f(P , M) .
- 
- rl [space] :
-  f(s(P,i) , M) => s(f(P , (M) ^ i),i) .
-
- rl [xtruc] :
-  f(x(P,i) , M) => skip .
- 
- crl [unless] :
-  f(unless c next P , (C,S)[F]) => skip 
-  if 
-  ( C | c ) => ( "" | "" ) .
-
-endm 
-
-
-mod NTCCPLUS+ is
- inc SCCP-SYMBOLS .
- pr STRING-PATTERN .
- pr SCCP .
- pr META-LEVEL .
-
- op f : SpaInstruc Cloud -> SpaInstruc .
- op [ _;_ ] : SpaInstruc Cloud -> Conf [ctor] .
- var F : ForestConstSet .
- var S : ConstSet .
- vars C c : Const .
- var X : Qid .
- vars P Q R : SpaInstruc .
- var i : Nat .
- vars M N : Cloud .
-
-
---- crl [obs] : 
-----    [ P ; M ] => [ f(Q , N) ; N ]  if  < Q  ; N > := metaReduce (SCCP , '< P ; M > ) .
-
----< Q ; N > := metaReduce( < P ; M > ) in SCCP . 
-
-
- rl [par] :
-  f(P || Q , M) => f(P , M) || f(Q , M) .
-
- rl [skip] :
-  f(skip , M) => skip .
-
- rl [next] :
-  f(next P , M) => P .
-
- rl [tell] :
-  f(tell(c) , M) => skip .
-
- rl [ask] :
-  f(ask c then P , M) => skip .
-
- rl [rec] :
-  f(rec X in P , M) => rec X in f(P , M) .
-
- rl [space] :
-  f(s(P,i) , M) => s(f(P , (M) ^ i),i) .
-
- rl [xtruc] :
-  f(x(P,i) , M) => skip .
-
- crl [unless] :
-  f(unless c next P , (C,S)[F]) => skip
-  if
-  ( C | c ) => ( "" | "" ) .
-
-endm
-
 mod SCCP-RUN is
   pr SYNTAX4SOCIALNET .
   
 endm
 
 mod NTCC-RUN is
- pr NTCCPLUS .
+ pr NTCC .
 
 endm
 

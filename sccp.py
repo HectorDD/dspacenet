@@ -40,8 +40,10 @@ def erraseSpacePostAndSay(program,searchingString):
 def functionf():
     global processes
     global memory
+##  print "PROCESS : " + processes
+##  print "MEMORY : " + memory
     archi = open(systemfiles+"runf.txt","w")
-    archi.write("red in NTCC-RUN : f("+processes+ ") . \n")
+    archi.write("rew in NTCC-RUN : f("+processes+ " , "+memory+") . \n")
     archi.close()
     os.system('./Maude/maude.linux64 < '+systemfiles+'runf.txt > '+systemfiles+'outputf.txt')
     archi = open(systemfiles+"outputf.txt","r")
@@ -364,8 +366,8 @@ def saveState(result):
     global memory
     parsingResult=parse("result Conf: < {} ; {} >", result )
     processes=parsingResult[0]
-    functionf()
     memory=parsingResult[1]
+    functionf()
     mem=open(namememory,"w")
     mem.write(memory)
     mem.close()
@@ -444,7 +446,7 @@ def runsccp():
 
         if(resultvar[0]=="r"):
             saveState(resultvar)
-            functionf()
+            ##functionf()
             ntccTictac(ntcctime)
             return jsonify({'result' : 'ok'})
     
