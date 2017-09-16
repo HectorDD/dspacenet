@@ -35,42 +35,6 @@ def erraseSpacePostAndSay(program,searchingString):
         index=program[index:].find(searchingString)
     return program
 
-##Definition of the function f for ntcc, it sends the residual process from sccp 
-##to a maude module that apply the function f to that process
-def functionf():
-    global processes
-    global memory
-##  print "PROCESS : " + processes
-##  print "MEMORY : " + memory
-    archi = open(systemfiles+"runf.txt","w")
-    archi.write("rew in NTCC-RUN : f("+processes+ " , "+memory+") . \n")
-    archi.close()
-    os.system('./Maude/maude.linux64 < '+systemfiles+'runf.txt > '+systemfiles+'outputf.txt')
-    archi = open(systemfiles+"outputf.txt","r")
-    notfound=True
-    r1=""
-    while(notfound and not("Bye." in r1) ):
-        r1=archi.readline()
-        if "result" in r1:
-            notfound=False
-    if(notfound):
-        stat=open(systemfiles+"status.txt","w")
-        stat.write("Error")
-        return jsonify({'result' : 'Error'})
-    else:
-        resultvar=r1
-        notend=True
-        while(notend):
-            r1=archi.readline()
-            if "Bye." in r1:
-                notend=False
-            else:
-                resultvar= resultvar + r1[3:]
-        resultvar=erraseLineJump(resultvar)
-    parsingResult=parse("result SpaInstruc: {}", resultvar )
-    resultvar=parsingResult[0]
-    processes = resultvar
-
 ##Function for translating the input process to machine language
 def translateProcess(process):
     file = open(systemfiles+"runtranslate.txt","w")
@@ -367,7 +331,6 @@ def saveState(result):
     parsingResult=parse("result Conf: < {} ; {} >", result )
     processes=parsingResult[0]
     memory=parsingResult[1]
-    functionf()
     mem=open(namememory,"w")
     mem.write(memory)
     mem.close()
@@ -416,7 +379,7 @@ def runsccp():
     recibido = addPidPosted(recibido)
     processes = recibido +" || " + processes
     archi = open(nameinput,"w")
-    archi.write("rew in SCCP-RUN : < "+processes+" ; empty[empty-forest] > . \n")
+    archi.write("red in NTCC-RUN : IO(< "+processes+" ; empty[empty-forest] >) . \n")
     archi.close()
     os.system('./Maude/maude.linux64 < '+systemfiles+'run.txt > '+systemfiles+'output.txt 2>&1')
     archi = open(nameoutput,"r")
@@ -446,7 +409,6 @@ def runsccp():
 
         if(resultvar[0]=="r"):
             saveState(resultvar)
-            ##functionf()
             ntccTictac(ntcctime)
             return jsonify({'result' : 'ok'})
     
