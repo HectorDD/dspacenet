@@ -4,6 +4,7 @@
 ---- By: Héctor Delgado, Camilo Rueda and Frank Valencia.
 ---------------------------------------------------------
 
+
 ---- Module for Naive String Pattern Matching: The string S matches the pattern P iff (S | P) =>* ("" | "").
  
 mod STRING-PATTERN is
@@ -276,55 +277,17 @@ mod SCCP-SYMBOLS is
 
  op <_;_> : SpaInstruc Cloud -> Conf [ctor] .
  
- op error : -> Conf [ctor] . *** needed for the meta-level
- 
 endm 
 --------
 
-mod STRPAT-DEDUC is
- inc STRING-PATTERN .
- sort Deduc .
- inc BOOL .
- subsort Bool < Deduc .
- 
- var S : String .
- var P : Pattern .
- 
- op deduc : String Pattern -> Deduc .
- op error : -> Deduc .
- 
- crl [deduc] :
-  deduc(S,P) => true if 
-  ( S | P ) => ( "" | "" ) .
-endm
-
-mod STRPAT-META is
- pr META-LEVEL .
- inc STRPAT-DEDUC .
- 
- var D : Deduc .
- var S : String .
- var P : Pattern .
- var x  : Deduc .
- op _|-_ : String Pattern -> Deduc .
- ---TODO: find out what unbounded is 
- ceq S |- P = true if downTerm(getTerm(metaRewrite(upModule('STRPAT-DEDUC, false), upTerm(deduc(S,P)), unbounded)), error) .
- eq S |- P = false [owise] .
-
-endm
-
----red in STRPAT-META : "234543234567876543765433345672345e" |- number .
-
----search in STRING-PATTERN : ( "234543234567876543765433345672345e" | number ) =>* ( "" | "" ) . 
 
 ---Module that defines the operational semantics of the language.
 mod SCCP is
- pr STRPAT-META .
  inc SCCP-SYMBOLS .
  pr STRING-PATTERN .
  pr CONST .
  
- ---op f : SpaInstruc Cloud -> SpaInstruc .
+ op f : SpaInstruc Cloud -> SpaInstruc .
  var c : Const . 
  
  var C1 : ConstSet .
@@ -338,21 +301,16 @@ mod SCCP is
  var F : ForestConstSet .
  var X : Qid .
  
---- eq f(unless c next P , CL) = P . 
+ eq f(unless c next P , CL) = P . 
 --- eq f(P || Q , CL) = f(P , CL) || f(Q , CL) .
 
  ---Rules for Tell Operator
  rl < tell(C) ; CL > =>
-< skip ; insertel(C,CL) > .
+ < skip ; insertel(C,CL) > .
  
  rl < tell(C) || Q ; CL > =>
-< skip || Q ; insertel(C,CL) > .
+ < skip || Q ; insertel(C,CL) > .
  ------
-
----Equations for Tell Operator
----eq < tell(C) ; CL > = < skip ; insertel(C,CL) > .
----eq < tell(C) || Q ; CL > = < skip || Q ; insertel(C,CL) > .
-------
  
  
  ---Rules for Spatial instructions
@@ -389,12 +347,12 @@ mod SCCP is
  crl < ask C then P ; (S1 , C1)[F] > =>
  < P ; (S1 , C1)[F] >
  if
- S1 |- C .
+ (S1 | C) => ("" | "") .
 
  crl < Q || ask C then P ; (S1 , C1)[F] > =>
  < Q || P ; (S1 , C1)[F] >
  if
- S1 |- C  .
+ (S1 | C) => ("" | "") .
  ------
 
 
@@ -434,7 +392,6 @@ mod SYNTAX4SOCIALNET is
  var i : Nat .
  vars c pid : Const .
  var X : Qid . 
- 
  eq [P]i = s(P,i) .
  eq xtr(P,i) = x(P,i) .
  eq enter i do P = s(P,i) .
@@ -477,10 +434,35 @@ mod SYNTAX4SOCIALNET is
  eq call(X) = unless kill-proc-cond next v(X) .
 endm
 
-mod NTCCPLUS+ is
- inc SCCP-SYMBOLS . 
- pr STRPAT-META .
 
+mod NTCC is
+ inc SCCP-SYMBOLS .
+
+ var S : ConstSet .
+ var C : Const .
+ var c : Const .
+ var X : Qid .
+ vars P Q P' : SpaInstruc .
+ var i : Nat .
+ op f : SpaInstruc -> SpaInstruc .
+ 
+ eq f(next P) = P .
+ eq f(P || Q) = f(P) || f(Q) .
+ eq f(tell(c)) = skip .
+ eq f(ask c then P) = skip .
+ eq f(unless c next P) = P .
+ eq f(rec X in P) = rec X in f(P) . 
+ eq f(s(P,i)) = s(f(P),i) .
+---( f(x(P,i)) = skip ???? ) 
+eq f(x(P,i)) = x(f(P),i) .
+ eq f(skip) = skip .
+ 
+
+endm
+
+mod NTCCPLUS is
+ inc SCCP-SYMBOLS . 
+ pr STRING-PATTERN .
  op f : SpaInstruc Cloud -> SpaInstruc .
   
  var F : ForestConstSet .
@@ -490,48 +472,47 @@ mod NTCCPLUS+ is
  vars P Q R : SpaInstruc .
  var i : Nat .
  var M : Cloud . 
+
+ rl [par] :
+  f(P || Q , M) => f(P , M) || f(Q , M) .
  
- eq f(P || Q , M) = f(P , M) || f(Q , M) .
- eq f(skip , M) = skip .
- eq f(next P , M) = P .
- eq f(tell(c) , M) = skip .
- eq f(ask c then P , M) = skip .
- eq f(rec X in P , M) = rec X in f(P , M) .
- eq f(s(P,i) , M) = s(f(P , (M) ^ i),i) .
- eq f(x(P,i) , M) = skip .
- ceq f(unless c next P , (C,S)[F]) = skip 
+ rl [skip] :
+  f(skip , M) => skip .
+ 
+ rl [next] :
+  f(next P , M) => P .
+ 
+ rl [tell] :
+  f(tell(c) , M) => skip .
+ 
+ rl [ask] :
+  f(ask c then P , M) => skip .
+ 
+ rl [rec] :
+  f(rec X in P , M) => rec X in f(P , M) .
+ 
+ rl [space] :
+  f(s(P,i) , M) => s(f(P , (M) ^ i),i) .
+
+ rl [xtruc] :
+  f(x(P,i) , M) => skip .
+ 
+ crl [unless] :
+  f(unless c next P , (C,S)[F]) => skip 
   if 
- C |- c .
- eq f(unless c next P , M) = P [owise] .
+  ( C | c ) => ( "" | "" ) .
 
 endm 
+
 
 mod SCCP-RUN is
   pr SYNTAX4SOCIALNET .
   
 endm
 
-
-mod SCCP-META is
- inc SCCP .
- 
- vars P Q : SpaInstruc .
- vars Cf : Conf .
- 
- op sccp* : Conf -> Conf .
-
- eq sccp*(Cf) = downTerm(getTerm(metaRewrite(upModule('SCCP, false), upTerm(Cf), unbounded)), error) .
-endm
-
 mod NTCC-RUN is
- pr NTCCPLUS+ .
- pr SCCP-META .
- vars P Q : SpaInstruc .
- vars M N : Cloud .
- 
- op IO : Conf -> Conf .
+ pr NTCCPLUS .
 
- ceq IO(< P ; M >) = < f(Q,N) ; N > if < Q ; N > := sccp*(< P ; M >) .
 endm
 
 mod U2N is
