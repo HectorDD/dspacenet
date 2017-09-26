@@ -1,3 +1,3 @@
-exports.url="http://192.168.250.8:8082";
-exports.dbuser="root";
-exports.dbpassword="educatedguess1";
+exports.url="http://sccp-hectordavid1228.c9users.io:8082";
+exports.dbuser="hectordavid1228";
+exports.dbpassword="";

@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from parse import * 
-from maude import *
+
 
 ##Structure of messages: "<clock,id_user>message"
 ##System files are located inside the following directory
@@ -12,9 +12,8 @@ def getNtccTime():
     time=cl.readline()
     cl.close()
     return int(time)
-    
-maude=MaudeProcess()
-    
+
+
 ##Definition of some global variables
 nameinput=systemfiles+"run.txt"
 nameoutput=systemfiles+"output.txt"
@@ -340,7 +339,13 @@ def saveState(result):
     proc.close()
 
 ##Function that errase a line jump
-
+def erraseLineJump(resultvar):
+    new=""
+    for i in resultvar:
+        if i != '\n':
+            new+=i
+            
+    return new
 
 ##Routes of the rest server
 import os
@@ -360,32 +365,52 @@ def runsccp():
     ntcctime=getNtccTime()
     global processes
     global memory
-    global maude
     refreshState()
-    received = request.json['config']
+    recibido = request.json['config']
     userp = request.json['user']
-    received = erraseSpacePostAndSay(received,"post")
-    received = erraseSpacePostAndSay(received,"say")
-    received = addIdandOrder(received,userp)
-    receivedstr=str(received)    
-    maude.run("red in SCCP-RUN : "+received+" . \n")
-    answer=maude.getOutput()
-    if answer[0]=="error":
-        return jsonify({'result' : 'error', 'error' : answer[1]})
+    recibido = erraseSpacePostAndSay(recibido,"post")
+    recibido = erraseSpacePostAndSay(recibido,"say")
+    recibido = addIdandOrder(recibido,userp)
+    receivedstr=str(recibido)
+    recibido = translateProcess(receivedstr)
+    if recibido=="Error":
+        return jsonify({'result' : 'error'})
+    recibido = addPid(recibido)
+    recibido = addPidPosted(recibido)
+    processes = recibido +" || " + processes
+    archi = open(nameinput,"w")
+    archi.write("red in NTCC-RUN : IO(< "+processes+" ; empty[empty-forest] >) . \n")
+    archi.close()
+    os.system('./Maude/maude.linux64 < '+systemfiles+'run.txt > '+systemfiles+'output.txt 2>&1')
+    archi = open(nameoutput,"r")
+    notfound=True
+    r1=""
+    while(notfound and not("Bye." in r1) ):
+        r1=archi.readline()
+        if "result" in r1:
+            notfound=False
+        elif "Warning" in r1:
+            return jsonify({'result' : 'error'})
+    if(notfound):
+        stat=open(systemfiles+"status.txt","w")
+        stat.write("Error")
+        return jsonify({'result' : 'error'})
     else:
-        parsingResult=parse("result SpaInstruc: {}", answer[1] )
-        received=parsingResult[0]
-    received = addPid(received)
-    received = addPidPosted(received)
-    processes = received +" || " + processes
-    maude.run("red in NTCC-RUN : IO(< "+processes+" ; empty[empty-forest] >) . \n")
-    answer=maude.getOutput()
-    if answer[0]=="error":
-        return jsonify({'result' : 'error', 'error' : answer[1]})
-    else:
-        saveState(answer[1])
-        ntccTictac(ntcctime)
-        return jsonify({'result' : 'ok'})
+        resultvar=r1
+        notend=True
+        while(notend):
+            r1=archi.readline()
+            if "Bye." in r1:
+                notend=False
+            else:
+                resultvar= resultvar + r1[3:]
+
+        resultvar=erraseLineJump(resultvar)
+
+        if(resultvar[0]=="r"):
+            saveState(resultvar)
+            ntccTictac(ntcctime)
+            return jsonify({'result' : 'ok'})
     
 ##This function returns the global memory
 @app.route('/getGlobal', methods=['GET'])
