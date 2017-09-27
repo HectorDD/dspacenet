@@ -340,7 +340,12 @@ def saveState(result):
     proc.close()
 
 ##Function that errase a line jump
-
+def errorToJson(errors):
+    jErrors=[]
+    for i in errors:
+        element={ 'error' : i }
+        jErrors.append(element)
+    return jErrors
 
 ##Routes of the rest server
 import os
@@ -371,7 +376,8 @@ def runsccp():
     maude.run("red in SCCP-RUN : "+received+" . \n")
     answer=maude.getOutput()
     if answer[0]=="error":
-        return jsonify({'result' : 'error', 'error' : answer[1]})
+        errors=errorToJson(answer[1])
+        return jsonify({'result' : 'error', 'errors' : errors })
     else:
         parsingResult=parse("result SpaInstruc: {}", answer[1] )
         received=parsingResult[0]
@@ -381,7 +387,8 @@ def runsccp():
     maude.run("red in NTCC-RUN : IO(< "+processes+" ; empty[empty-forest] >) . \n")
     answer=maude.getOutput()
     if answer[0]=="error":
-        return jsonify({'result' : 'error', 'error' : answer[1]})
+        errors=errorToJson(answer[1])
+        return jsonify({'result' : 'error', 'errors' : errors})
     else:
         saveState(answer[1])
         ntccTictac(ntcctime)

@@ -5,7 +5,20 @@ html,body {
   
 }
 
-
+div#divwarning{
+  text-align: center;
+  margin-top: 5%;
+  margin-left: 30%;
+  width:40%;
+  margin-right: 30%;
+  font-size: 200;
+  position: fixed;
+  z-index:3;
+  visibility: visible;
+  padding: 10px;
+  border: 1px solid rgba(0, 0, 200, .2);
+  border-radius: 4px;
+}
 
 #dbody{
 

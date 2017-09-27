@@ -62,13 +62,13 @@ router.get('/' , function(req, res, next) {
             client.post(url+"/getMsg", argsPost , function (data, response) {
                var mf = data.messages_from;
                var mt = data.messages_to; 
-               res.render('wall',{ id_user: req.session.id_user , error : req.session.var_err , messages_from : mf , messages_to : mt , user : req.session.user, user_messages : req.session.user_messages , friends : myFriends , memoria : mem });
+               res.render('wall',{ errors : req.session.var_errs , id_user: req.session.id_user , error : req.session.var_err , messages_from : mf , messages_to : mt , user : req.session.user, user_messages : req.session.user_messages , friends : myFriends , memoria : mem });
                req.session.var_err="0";
           });
          
          }
           else{
-           res.render('wall',{ id_user: req.session.id_user , error : req.session.var_err , user : req.session.user, user_messages : req.session.user_messages , friends : myFriends , memoria : mem });
+           res.render('wall',{  errors : req.session.var_errs , id_user: req.session.id_user , error : req.session.var_err , user : req.session.user, user_messages : req.session.user_messages , friends : myFriends , memoria : mem });
            req.session.var_err="0";          
               
           }
@@ -100,9 +100,12 @@ router.post('/post' , function(req, res, next) {
              };
  client.post(url+"/runsccp", argsPost , function (data, response) {
      var r = data.result;
+     
      console.log("Result: "+r);
      if(r=="error"){
         req.session.var_err="1";
+        req.session.var_errs=data.errors;
+        console.log(req.session.var_errs);
         res.redirect('../wall');
      }
      else{
