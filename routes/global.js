@@ -40,7 +40,7 @@ router.get('/' , function(req, res, next) {
     client.get(url+"/getGlobal", function (data, response) {
     // parsed response body as js object 
     var r=data.result;
-    res.render('global',{ memoria : r , id_user: req.session.id_user , error : req.session.var_err , user : req.session.user, user_messages : req.session.user_messages });
+    res.render('global',{ errors : req.session.var_errs , memoria : r , id_user: req.session.id_user , error : req.session.var_err , user : req.session.user, user_messages : req.session.user_messages });
 
     });
     
@@ -59,10 +59,12 @@ router.post('/post' , function(req, res, next) {
      var r = data.result;
      console.log("Result: "+r);
      if(r=="error"){
+        req.session.var_errs=data.errors; 
         req.session.var_err="1";
         res.redirect('../global');
      }
      else{
+        req.session.var_errs="";
         req.session.var_err="0";
         res.redirect('../global');  
      }

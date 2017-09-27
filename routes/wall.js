@@ -105,11 +105,12 @@ router.post('/post' , function(req, res, next) {
      if(r=="error"){
         req.session.var_err="1";
         req.session.var_errs=data.errors;
-        console.log(req.session.var_errs);
+        
         res.redirect('../wall');
      }
      else{
         req.session.var_err="0";
+        req.session.var_errs="";
         res.redirect('../wall');  
      }
      

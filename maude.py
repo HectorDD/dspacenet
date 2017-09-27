@@ -4,13 +4,18 @@ import tempfile
 import time
 from subprocess import Popen, PIPE
 
+#input: string
+#output: string without \n
+##erase every ocurrency of the character \n on a string
 def erraseLineJump(string):
     new=""
     for i in string:
         if i != '\n':
             new+=i
     return new
-    
+
+##input: string with warnings inside
+##output: list of warnings obtained from the input string
 def getWarnings(string):
     index=string.find("Warning")
     new=""
@@ -25,13 +30,25 @@ def getWarnings(string):
             index=string.find("Warning")
     warnings.append(string[index:findex])
     return warnings
-    
+
+##Class that represents a Maude process. 
+##Atributes:
+##p: the Maude process
+##f: the output file of the Maude process
+##t: time for sleep in seconds
+##output: the output of the last input
+##Methods:
+##run(command): send the command to 'p', wait in 'f' for the answer and stores the answer in 'output'.
+##getOutput(): return a list with the status of the last execution, the result and the complete output of the process. example:
+##["error",["Warning: ...","Warning: ..."],"Maude> red in ..."]
+##["ok","result in NTCC-RUN : < tell(..."]
 class MaudeProcess:
     def __init__(self):
         self.output=""
         self.t=0.01
+        # define f as a temporal file
         self.f = tempfile.TemporaryFile() 
-        # start process, redirect stdout
+        # start Maude process, redirect stdout and stderr to f
         self.p = subprocess.Popen(["(cat) | ./Maude/maude.linux64"],
                          stdout=self.f,
                          stderr=subprocess.STDOUT,
@@ -39,15 +56,20 @@ class MaudeProcess:
                          shell=True,
                          bufsize=0)
     def run(self,command):
+        # send the command to the Maude process p
         self.p.stdin.write(command)
         self.f.seek(0) 
+        # read the output file of the Maude process
         r=self.f.read()
+        # wait the output of the process, if is successful or have warnings
         while (not ("result" in r or "Warning" in r)):
             time.sleep(self.t)
             self.f.seek(0)
             r=self.f.read()
         self.f.seek(0)
+        # erase the content of the output file
         self.f.truncate()
+        # store the output r in the atribute output
         self.output=r
     def getOutput(self):
         index=self.output.find("result")
@@ -63,4 +85,4 @@ class MaudeProcess:
             result=erraseLineJump(result[:findex])
             status="ok"
         return [status,result,self.output]
-        
+##

@@ -255,7 +255,8 @@ def convertMemInJson(mem):
     if memParse != None:
         messages=splitMessages(memParse[0])
     else:
-        messages=[mem]
+
+        messages=[mem[1:len(mem)-1]]
     jMessages=[]
     for i in messages:
         jMessages.append(extractInfo(i))
@@ -398,11 +399,15 @@ def runsccp():
 @app.route('/getGlobal', methods=['GET'])
 def getGlobal():
     global memory
-    answer=getCurrAgent(memory)
-    parsingResult=parse("{}[{}]", answer )
+    
+    #answer=getCurrAgent(memory)
+    parsingResult=parse("{}[{}]", memory )
+    
     if parsingResult[0] is None:
+        
         return jsonify({'result' : 'Empty'})
     else:
+        
         answer=convertMemInJson(parsingResult[0])
         return jsonify({'result' : answer})
 
