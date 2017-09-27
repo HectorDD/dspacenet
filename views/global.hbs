@@ -1,7 +1,9 @@
 
 <center>
+<div><input type="hidden" id="nocache">
 {{#ifCond error '==' '1'}}
 <div class="alert-danger" id="divwarning" >
+  <input type="hidden" id="nocache">
   <strong>Warnings</strong><br>
   {{#each errors}}
     
@@ -11,9 +13,9 @@
   <br>
   <input type="button" class="btn btn-warning" id="hidew" value="hide warnings" />
 
-
 </div>
 {{/ifCond}}
+</div>
 <div class="row" id="rowheader">
   <div class="col-md-12" id="header">
     

@@ -373,7 +373,11 @@ def runsccp():
     received = erraseSpacePostAndSay(received,"post")
     received = erraseSpacePostAndSay(received,"say")
     received = addIdandOrder(received,userp)
-    receivedstr=str(received)    
+    try:
+        receivedstr=str(received) 
+    except:
+        errors=errorToJson(["characters not allowed"])
+        return jsonify({'result' : 'error', 'errors' : errors })
     maude.run("red in SCCP-RUN : "+received+" . \n")
     answer=maude.getOutput()
     if answer[0]=="error":

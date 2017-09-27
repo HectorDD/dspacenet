@@ -64,12 +64,14 @@ router.get('/' , function(req, res, next) {
                var mt = data.messages_to; 
                res.render('wall',{ errors : req.session.var_errs , id_user: req.session.id_user , error : req.session.var_err , messages_from : mf , messages_to : mt , user : req.session.user, user_messages : req.session.user_messages , friends : myFriends , memoria : mem });
                req.session.var_err="0";
+               req.session.var_errs="";
           });
          
          }
           else{
            res.render('wall',{  errors : req.session.var_errs , id_user: req.session.id_user , error : req.session.var_err , user : req.session.user, user_messages : req.session.user_messages , friends : myFriends , memoria : mem });
-           req.session.var_err="0";          
+           req.session.var_err="0";     
+           req.session.var_errs=""; 
               
           }
         

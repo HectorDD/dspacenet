@@ -41,7 +41,8 @@ router.get('/' , function(req, res, next) {
     // parsed response body as js object 
     var r=data.result;
     res.render('global',{ errors : req.session.var_errs , memoria : r , id_user: req.session.id_user , error : req.session.var_err , user : req.session.user, user_messages : req.session.user_messages });
-
+    req.session.var_err="0";
+    req.session.var_errs="";
     });
     
     

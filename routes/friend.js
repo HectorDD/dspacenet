@@ -35,7 +35,9 @@ router.get('/:id' , function(req, res, next) {
                var mt = data.messages_to; 
               // res.render('wall',{ messages_from : mf , messages_to : mt , user : req.session.user, user_messages : req.session.user_messages , friends : myFriends , memoria : mem });
                res.render('friend',{ errors : req.session.var_errs, id_user: req.session.id_user , error : req.session.var_err , id_friend: req.params.id , messages_from : mf , messages_to : mt , friend_user : friendUser , user : req.session.user, friends : myFriends , memoria : mem });
-               req.session.var_err="0"; 
+               req.session.var_err="0";
+
+               req.session.var_errs="";
                });
                 
             });
