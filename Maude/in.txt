@@ -1,8 +1,0 @@
-search in STRING-PATTERN : ("hello frank we are in a meeting" | [?]* . "frank" . [?]*) =>* "" | "" .
-search in STRING-PATTERN : ("ab" | ? . ?) =>* "" | "" .
-search in STRING-PATTERN : ("ab" | ("a" . * & * . "b") v ("c" . * & * . "d")      ) =>* "" | "" .
-search in STRING-PATTERN : ("ab" | ("d" . * & * . "b") v ("c" . * & * . "d")      ) =>* "" | "" .
-search in STRING-PATTERN : ("af" | ("a" v "c") . ("b" v "d")      ) =>* "" | "" .
-search in STRING-PATTERN : ("01011010100010101" | [ "1" v "0" ]* ) =>* "" | "" .
-search in STRING-PATTERN : (* . "01011010100010101" | [ "1" v "0" ]* ) =>* "" | "" .
-search in STRING-PATTERN : ("013011010100010101" | [ "1" v "0" v "2" ]* ) =>* "" | "" .
