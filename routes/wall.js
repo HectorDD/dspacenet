@@ -54,35 +54,35 @@ router.get('/' , function(req, res, next) {
         var myFriends=rows;
         if(req.session.id_user_messages != "-1"){
            var argsPost= {
-                     data: { 
-                     'user_to' : req.session.id_user_messages, 
+                     data: {
+                     'user_to' : req.session.id_user_messages,
                      'user_from' : req.session.id_user },
                      headers: { "Content-Type": "application/json" }
                    };
             client.post(url+"/getMsg", argsPost , function (data, response) {
                var mf = data.messages_from;
-               var mt = data.messages_to; 
+               var mt = data.messages_to;
                res.render('wall',{ errors : req.session.var_errs , id_user: req.session.id_user , error : req.session.var_err , messages_from : mf , messages_to : mt , user : req.session.user, user_messages : req.session.user_messages , friends : myFriends , memoria : mem });
                req.session.var_err="0";
                req.session.var_errs="";
           });
-         
+
          }
           else{
            res.render('wall',{  errors : req.session.var_errs , id_user: req.session.id_user , error : req.session.var_err , user : req.session.user, user_messages : req.session.user_messages , friends : myFriends , memoria : mem });
-           req.session.var_err="0";     
-           req.session.var_errs=""; 
-              
+           req.session.var_err="0";
+           req.session.var_errs="";
+
           }
-        
+
         });
-        
+
      });
  }
  else{
      res.redirect('../new');
  }
- 
+
 });
 
 
@@ -94,7 +94,7 @@ router.post('/post' , function(req, res, next) {
  if(program != "skip"){
  var programcopy = program.replace(/"/g,"'");
  program = program + ' || repeat tell("{pid:{pid}|'.concat(user.concat('} '.concat(programcopy.concat('")'))))
- } 
+ }
  var fprog = "([".concat(program.concat("] ".concat(id_user.concat(")"))));
  var argsPost= {
              data: { "config": fprog , "user": user},
@@ -102,23 +102,23 @@ router.post('/post' , function(req, res, next) {
              };
  client.post(url+"/runsccp", argsPost , function (data, response) {
      var r = data.result;
-     
+
      console.log("Result: "+r);
      if(r=="error"){
         req.session.var_err="1";
         req.session.var_errs=data.errors;
-        
+
         res.redirect('../wall');
      }
      else{
         req.session.var_err="0";
         req.session.var_errs="";
-        res.redirect('../wall');  
+        res.redirect('../wall');
      }
-     
-     
+
+
   });
- 
+
 });
 
 router.get('/newwall' , function(req, res, next) {

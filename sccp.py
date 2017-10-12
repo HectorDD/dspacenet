@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from parse import * 
+from parse import *
 from maude import *
 
 ##Structure of messages: "<clock,id_user>message"
@@ -12,9 +12,9 @@ def getNtccTime():
     time=cl.readline()
     cl.close()
     return int(time)
-    
+
 maude=MaudeProcess()
-    
+
 ##Definition of some global variables
 nameinput=systemfiles+"run.txt"
 nameoutput=systemfiles+"output.txt"
@@ -105,7 +105,7 @@ def ntccTictac(c):
     stwrite=str(c+1)
     cl.write(stwrite)
     cl.close()
-    
+
 ##Function for adding clock and order to post programs
 def addIdandOrder(program,id_user):
   global ntcctime
@@ -121,7 +121,7 @@ def addIdandOrder(program,id_user):
       index=program[oldindex:].find(tellstr)
   program=addIdandOrderSay(program,id_user)
   return program
-  
+
 ##Function for adding clock and order to say programs
 def addIdandOrderSay(program,id_user):
   global ntcctime
@@ -136,7 +136,7 @@ def addIdandOrderSay(program,id_user):
       oldindex=index+len(userstr)
       index=program[oldindex:].find(tellstr)
   return program
-  
+
 ##Function that extract the information of a string that contains a message
 def extractInfo(msg):
     global ntcctime
@@ -187,7 +187,7 @@ refreshState()
 def elimOther(agents):
     stack=[]
     index=0
-    for i in agents:        
+    for i in agents:
         if i!='[' :
             index+=1
         else:
@@ -210,7 +210,7 @@ def elimOther(agents):
 def getCurrAgent(agents):
     stack=[]
     index=0
-    for i in agents:        
+    for i in agents:
         if i!='[' :
             index+=1
         else:
@@ -231,7 +231,7 @@ def getCurrAgent(agents):
 ##Function that obtains every message inside a string of messages from the memory of an agent
 ##stringMessages: '"message 1", "message 2", "message 3" ... '
 ##return: ['message 1', 'message 2', 'message 3' ...]
-def splitMessages(stringMessages): 
+def splitMessages(stringMessages):
     messages=[]
     message=""
     quotecounter=0
@@ -262,7 +262,7 @@ def convertMemInJson(mem):
         jMessages.append(extractInfo(i))
 
     return jMessages
-    
+
 ##Function that convert the agent memory in a json list with every information of processes stored on the memory
 def convertProcessesInJson(mem):
     index=1
@@ -290,7 +290,7 @@ def calculateAgentMemory(agentId):
         agents=elimOther(agents)
         agentId=agentId-1
     agents=getCurrAgent(agents)
-    
+
     return agents
 
 ##Function that calculate messages on the private mailbox
@@ -358,7 +358,7 @@ def index():
     return jsonify({'message' : 'SCCP'})
 
 ##This route is for running a program
-##It comunicate the program to the sccp 
+##It comunicate the program to the sccp
 ##VM and store the result
 @app.route('/runsccp', methods=['POST'])
 def runsccp():
@@ -374,7 +374,7 @@ def runsccp():
     received = erraseSpacePostAndSay(received,"say")
     received = addIdandOrder(received,userp)
     try:
-        receivedstr=str(received) 
+        receivedstr=str(received)
     except:
         errors=errorToJson(["characters not allowed"])
         return jsonify({'result' : 'error', 'errors' : errors })
@@ -398,20 +398,20 @@ def runsccp():
         saveState(answer[1])
         ntccTictac(ntcctime)
         return jsonify({'result' : 'ok'})
-    
+
 ##This function returns the global memory
 @app.route('/getGlobal', methods=['GET'])
 def getGlobal():
     global memory
-    
+
     #answer=getCurrAgent(memory)
     parsingResult=parse("{}[{}]", memory )
-    
+
     if parsingResult[0] is None:
-        
+
         return jsonify({'result' : 'Empty'})
     else:
-        
+
         answer=convertMemInJson(parsingResult[0])
         return jsonify({'result' : answer})
 
@@ -421,10 +421,14 @@ def getWall():
     agent=int(request.json['id'])
     answer=calculateAgentMemory(agent)
     paranswer=parse("{}[{}]", answer )
-    ranswer=paranswer[0]
-    rranswer=convertMemInJson(ranswer)
-    rranswer.sort(key=lambda clock: int(clock['clock']),reverse=True)
-    return jsonify({'result' : rranswer})
+    try:
+        ranswer=paranswer[0]
+        rranswer=convertMemInJson(ranswer)
+        rranswer.sort(key=lambda clock: int(clock['clock']),reverse=True)
+        return jsonify({'result' : rranswer})
+    except:
+        return jsonify({'result' : 'session error'})
+
 
 ##This function returns the posted processes on a space
 @app.route('/getPostedProcesses', methods=['POST'])
@@ -445,13 +449,13 @@ def getMsg():
     sender=calculateMessages(user_from,user_to)
     if not sender :
         sender=[]
-    else : 
+    else :
         sender=convertMemInJson(sender)
 
     receiver=calculateMessages(user_to,user_from)
     if not receiver :
         receiver=[]
-    else : 
+    else :
         receiver=convertMemInJson(receiver)
 
     result=sender+receiver
@@ -461,4 +465,4 @@ def getMsg():
 
 if __name__ == '__main__':
     app.run(host= '0.0.0.0',port=8082)
-    
+

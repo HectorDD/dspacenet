@@ -1,10 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Client = require('node-rest-client').Client;
-var fs = require('fs');
 var client = new Client();
-var db_users = require('../db/users');
-const url = require('url');   
 var urlrest = require("./../config.js").url;
 
 function fProg(program,id_user){
@@ -33,7 +30,7 @@ function sendMsg (res,req,user_msg,msg,user_from,user_to) {
         return r;
         //
     });
-  
+
 }
 
 function sendMsgF (id1,res,req,user_msg,msg,user_from,user_to) {
@@ -55,14 +52,14 @@ function sendMsgF (id1,res,req,user_msg,msg,user_from,user_to) {
         return r;
         //
     });
-  
+
 }
 
 
 router.get('/:id1/:user' , function(req, res, next) {
   req.session.user_messages=req.params.user;
   req.session.id_user_messages=req.params.id1;
-  
+
   res.redirect('../../wall');
 });
 
@@ -90,8 +87,8 @@ router.get('/' , function(req, res, next) {
     console.log("user_message :".concat(req.session.id_user_messages))
     console.log("user :".concat(req.session.id_user))
       var argsPost= {
-                  data: { 
-                  'user_to' : req.session.id_user_messages, 
+                  data: {
+                  'user_to' : req.session.id_user_messages,
                   'user_from' : req.session.id_user },
                   headers: { "Content-Type": "application/json" }
                 };
@@ -101,7 +98,7 @@ router.get('/' , function(req, res, next) {
           var mt = data.messages_to;
           res.json({"mf" : mf , "mt" : mt});
        });
-  }     
+  }
 });
 
 

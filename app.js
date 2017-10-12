@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session')
+var hbs = require('hbs');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -13,6 +14,9 @@ var wall = require('./routes/wall');
 var friend = require('./routes/friend');
 var send = require('./routes/send');
 var global = require('./routes/global');
+var api = require('./v2/routes/api');
+var wallV2 = require('./v2/routes/wall');
+var wallV3 = require('./v3/routes/wall');
 
 
 var app = express();
@@ -20,6 +24,9 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
+
+hbs.registerPartials(path.join(__dirname, 'v3/templates/views/partials'));
+require('./v3/templates/views/helpers');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -29,20 +36,28 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({secret:"este es mi secreto"}));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/v3/', express.static(path.join(__dirname, 'v3/public')));
 
 app.use(express.static('public'));
 
+app.use('/new', new1);
+app.use(function (req, res, next) {
+  if (req.session.user === undefined) {
+    res.redirect('/new');
+  } else next();
+});
 app.use('/', index);
 app.use('/users', users);
 app.use('/prev', index);
-app.use('/new', new1);
-app.use('/wall', wall);
 app.use('/logout', index);
 app.use('/friend', friend);
 app.use('/send', send);
 app.use('/global', global);
+app.use('/api', api);
 
-app.use('/newwall', wall);
+app.use('/oldwall', wall);
+app.use('/wall/', wallV2);
+app.use('/v3/wall/', wallV3);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

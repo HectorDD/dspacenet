@@ -4,7 +4,7 @@ var Client = require('node-rest-client').Client;
 var fs = require('fs');
 var client = new Client();
 var db_users = require('../db/users');
-const url = require('url');   
+const url = require('url');
 
 function objClone (obj) {
     return JSON.parse(JSON.stringify(obj));
@@ -42,7 +42,7 @@ router.post('/login' , function(req, res, next) {
           "error" : "1"
                  }
         }));
-     
+
     }
  });
 });

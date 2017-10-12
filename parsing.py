@@ -98,15 +98,27 @@ def extractInfo(filename):
             ##os.system("cat /dev/null > outputimportant.txt")
             file.close()
             return resultvar
+            
+def erraseMaudeSpaces(string):
+    new=""
+    i=0
+    n=len(string)
+    while i < n-1:
+        if not string[i].isspace() or (string[i].isspace() and not string[i+1].isspace()):
+            new+=string[i]
+        i+=1
+    return new
     
-
-initMaude()
-command='red in NTCC-RUN : IO(< tell("bla") || tell("hello world") ; empty[empty-forest] >) .'
-runMaude(command)
-auxextract("outputimportant.txt")
-##print extractInfo("outputimportant.txt")
-command2='red in NTCC-RUN : IO(< tell("hehehe") || tell("blablabla") ; empty[empty-forest] >) .'
-runMaude(command2)
-##print extractInfo("outputimportant.txt")
-m=MaudeProcess()
-print m
+# initMaude()
+# command='red in NTCC-RUN : IO(< tell("bla") || tell("hello world") ; empty[empty-forest] >) .'
+# runMaude(command)
+# auxextract("outputimportant.txt")
+# ##print extractInfo("outputimportant.txt")
+# command2='red in NTCC-RUN : IO(< tell("hehehe") || tell("blablabla") ; empty[empty-forest] >) .'
+# runMaude(command2)
+# ##print extractInfo("outputimportant.txt")
+# m=MaudeProcess()
+# print m
+cadena="blabla  bla  \n bla bbla  bla  \n   (!)as  sd   ."
+print "cadena antes de : " + cadena
+print "despues : " + erraseMaudeSpaces(cadena)

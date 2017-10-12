@@ -120,18 +120,18 @@ a {
 }
 
 #postedp {
-  padding: 7px 7px 7px 7px;
+
   text-align:center ;
- 
   background-color: white ;
-  border-radius: 4px 4px 4px 4px;
   max-height: 660px;
   position: fixed;
   z-index:2;
-  visibility: visible;
+  visibility: hidden;
   width:23%;
   min-height:510px ;
-  spacing: 7px;
+  padding:7px;
+  border-radius: 4px ;
+  overflow-y:scroll;
 }
 
 

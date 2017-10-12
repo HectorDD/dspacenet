@@ -1,0 +1,130 @@
+<div class="row">
+  <div class="col">
+    <div class="jumbotron" style="background:url(/images/{{user}}.jpg); background-size:cover; background-position:center">
+      <h2 class="text-white">{{user}}'s Space</h2>
+    </div>
+  </div>
+</div>
+<!-- Breadcrumbs-->
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/global">Global</a>
+  </li>
+  <li class="breadcrumb-item active">My Space</li>
+</ol>
+<div class="row" id="rowcontent">
+    <div class="col-md-3" id="left-col">
+  <div  id="friends">
+    {{#ifCond user_messages '!=' 'None'}}
+
+    <p class="wall">Private messages to {{user_messages}} </p>
+    <div id="dmessages">
+
+    {{#each messages_to}}
+    {{#ifCond this.user_msg '==' ../user}}
+    {{#ifCond this.user_msg '!=' 'private'}}
+    <div id="onemessageto" align="right">
+      {{this.msg}}  [pid {{this.clock}}]
+
+    </div>
+    {{/ifCond}}
+    {{/ifCond}}
+    {{#ifCond this.user_msg '!=' ../user}}
+    {{#ifCond this.user_msg '!=' 'private'}}
+    <div id="onemessagefrom" align="right">
+      {{this.msg}}  [pid {{this.clock}}]
+
+    </div>
+    {{/ifCond}}
+    {{/ifCond}}
+    {{/each}}
+    <div id="wallmessage">
+      <form action="/send" method="post">
+      <input class="form-control" type="text" name="message" id="message" ></input>
+      <br/>
+      <input type="submit" class="btn btn-primary" value="Send" />
+      <br/>
+      </form>
+    </div >
+    <script type="text/javascript">
+    $("#dmessages").scrollTop($("#dmessages")[0].scrollHeight);
+    </script>
+  </div>
+  {{/ifCond}}
+
+
+  </div>
+
+  </div>
+
+
+
+
+
+  <div class="col-md-6" id="content">
+   <!-- This is the content -->
+    <div id="processwall">
+      <img src="images/{{user}}.jpg" width="160px" height=width class="img-circle" >
+      <br><br>
+      <p id="process-paragraph">
+      <b>Public Posts</b>
+      <br>
+      </p>
+
+
+      <form action="/wall/post" method="post" id="programform">
+      <div id="wallmessage">
+      <input class="form-control" type="text" name="config" id="config" ></input>
+      <input type="submit" class="btn btn-primary" id="runsccp" value="Post">
+      <input type="button" class="btn btn-warning" id="clean" value="clear">
+      <input type="button" class="btn btn-warning" id="skip" value="skip">
+      <input type="hidden" id="nocache">
+      <div class="alert-danger" id="errormessage" style="display:none">
+        <strong>Warning!</strong> Something went wrong.
+      </div>
+      </div>
+      <div id="refreshsccp"><input type="button" class="btn btn-success" id="refreshsccp" value="Refresh" /></div>
+      </form>
+      <div id="wallposts">
+      {{#each memoria}}
+        {{#ifCond this.user_msg '!=' 'private'}}
+	      <div id="wallmessage">
+          <b>{{this.user_msg}}</b>:  {{this.msg}}
+
+        </div>
+        {{/ifCond}}
+      {{/each}}
+      </div>
+    </div>
+
+
+    <!-- /This is the content -->
+  </div>
+
+
+
+
+    <div class="col-md-3" id="right-col">
+        <input type="button" class="btn btn-primary" id="showp" value="hide posted processes" />
+
+	  <br>
+	  <div id="postedp">
+      {{#each memoria}}
+        {{#ifCond this.class '==' 'process'}}
+          <div id="wallmessage">{{this.msg}}</div>
+        {{/ifCond}}
+      {{/each}}
+    </div>
+  </div>
+
+</div>
+<div id="warning-popup" class="alert-danger" style="position:absolute; width:300px; border-radius:5px; left:50%; margin-left:-150px; top:100px; padding:10px; text-align:center; display:none">
+  <strong>Warnings</strong>
+  <div></div>
+  <input type="button" class="btn btn-warning" onclick="$(this).parent().hide()" value="Close">
+</div>
+
+
+{{#extend 'scripts' }}
+<script src="js/dspacenet.js"></script>
+{{/extend}}

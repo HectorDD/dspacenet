@@ -10,10 +10,20 @@ from subprocess import Popen, PIPE
 def erraseLineJump(string):
     new=""
     for i in string:
-        if i != '\n':
+        if i != '\n' and (not string[i].isspace() or (string[i].isspace() and not string[i+1].isspace())):
             new+=i
     return new
 
+def erraseMaudeSpaces(string):
+    new=""
+    i=0
+    n=len(string)
+    while i < n-1:
+        if not string[i].isspace() or (string[i].isspace() and not string[i+1].isspace()):
+            new+=string[i]
+        i+=1
+    return new
+    
 ##input: string with warnings inside
 ##output: list of warnings obtained from the input string
 def getWarnings(string):
@@ -82,7 +92,9 @@ class MaudeProcess:
         else:
             result=self.output[index:]
             findex=result.find("Maude")
-            result=erraseLineJump(result[:findex])
+            result=erraseMaudeSpaces(result[:findex])
             status="ok"
         return [status,result,self.output]
 ##
+
+
