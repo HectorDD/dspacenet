@@ -405,10 +405,8 @@ def runsccp():
 @app.route('/getGlobal', methods=['GET'])
 def getGlobal():
     global memory
-
     #answer=getCurrAgent(memory)
     parsingResult=parse("{}[{}]", memory )
-
     if parsingResult[0] is None:
 
         return jsonify({'result' : 'Empty'})

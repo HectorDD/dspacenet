@@ -85,7 +85,7 @@
   function updateGlobal() {
     getGlobal().done((data) => {
       $postsContainer.empty();
-      data.forEach(message => pushPost(message));
+      data.forEach(message => message.user_msg !== 'private' ? pushPost(message) : null);
       checkPosts();
     }).fail((jqXHR) => {
       console.log(jqXHR.responseJSON);
