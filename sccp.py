@@ -357,6 +357,22 @@ app = Flask(__name__)
 def index():
     return jsonify({'message' : 'SCCP'})
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ##This route is for running a program
 ##It comunicate the program to the sccp
 ##VM and store the result
@@ -372,7 +388,6 @@ def runsccp():
     userp = request.json['user']
     if received=="":
         return jsonify({'result' : 'error', 'errors' : [{'error' : 'empty input'}]})
-    print "received is : " + received
     received = erraseSpacePostAndSay(received,"post")
     received = erraseSpacePostAndSay(received,"say")
     received = addIdandOrder(received,userp)

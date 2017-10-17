@@ -1,5 +1,6 @@
 # coding=utf-8
 import subprocess
+import os
 import tempfile
 import time
 from subprocess import Popen, PIPE
@@ -66,7 +67,9 @@ class MaudeProcess:
                          shell=True,
                          bufsize=0)
     def renewProcess(self):
-        self.p.terminate()
+        processid = str(self.p.pid)
+        print "this is the pid" + processid
+        os.system("kill -9 "+processid)
         self.p = subprocess.Popen(["(cat) | ./Maude/maude.linux64"],
                          stdout=self.f,
                          stderr=subprocess.STDOUT,
