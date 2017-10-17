@@ -66,7 +66,7 @@ class MaudeProcess:
                          shell=True,
                          bufsize=0)
     def renewProcess(self):
-        self.p.kill()
+        self.p.terminate()
         self.p = subprocess.Popen(["(cat) | ./Maude/maude.linux64"],
                          stdout=self.f,
                          stderr=subprocess.STDOUT,
@@ -81,7 +81,7 @@ class MaudeProcess:
         r=self.f.read()
         # wait the output of the process, if is successful or have warnings
         i=0
-        while (i<200 and not ("result" in r or "Warning" in r)):
+        while (i<300 and not ("result" in r or "Warning" in r)):
             time.sleep(self.t)
             self.f.seek(0)
             r=self.f.read()
@@ -89,7 +89,7 @@ class MaudeProcess:
         self.f.seek(0)
         #erase the content of the output file
         self.f.truncate()
-        if i==200:
+        if i==300:
             self.renewProcess()
             self.output="timeout"
         else:

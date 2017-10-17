@@ -372,6 +372,7 @@ def runsccp():
     userp = request.json['user']
     if received=="":
         return jsonify({'result' : 'error', 'errors' : [{'error' : 'empty input'}]})
+    print "received is : " + received
     received = erraseSpacePostAndSay(received,"post")
     received = erraseSpacePostAndSay(received,"say")
     received = addIdandOrder(received,userp)
