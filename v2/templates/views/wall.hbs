@@ -31,11 +31,13 @@
       </div>
       <p class="wall">Private messages <span id="messageRecipient"></span></p>
       <div id="dmessages">
-        <div id="onemessageto" align="right">
-          {{this.msg}}  [pid {{this.clock}}]
-        </div>
-        <div id="onemessagefrom" align="right">
-          {{this.msg}}  [pid {{this.clock}}]
+        <div id="privateMessagesContainer">
+          <div id="onemessageto" align="right">
+            {{this.msg}}  [pid {{this.clock}}]
+          </div>
+          <div id="onemessagefrom" align="right">
+            {{this.msg}}  [pid {{this.clock}}]
+          </div>
         </div>
         <div id="wallmessage">
           <form action="/send" method="post" id="privatesForm">

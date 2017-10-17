@@ -370,6 +370,8 @@ def runsccp():
     refreshState()
     received = request.json['config']
     userp = request.json['user']
+    if received=="":
+        return jsonify({'result' : 'error', 'errors' : [{'error' : 'empty input'}]})
     received = erraseSpacePostAndSay(received,"post")
     received = erraseSpacePostAndSay(received,"say")
     received = addIdandOrder(received,userp)
@@ -413,6 +415,7 @@ def getGlobal():
     else:
 
         answer=convertMemInJson(parsingResult[0])
+        answer.sort(key=lambda clock: int(clock['clock']),reverse=True)
         return jsonify({'result' : answer})
 
 ##This function returns the wall of an agent

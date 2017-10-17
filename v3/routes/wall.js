@@ -19,6 +19,7 @@ router.get('/' ,(req, res) => {
       const renderOptions = {
         errors: req.session.var_errs,
         id_user: req.session.id_user,
+        spaceId: req.session.id_user,
         error: req.session.var_err,
         user: req.session.user,
         user_messages: req.session.user_messages,

@@ -23,7 +23,7 @@ def erraseMaudeSpaces(string):
             new+=string[i]
         i+=1
     return new
-    
+
 ##input: string with warnings inside
 ##output: list of warnings obtained from the input string
 def getWarnings(string):
@@ -41,7 +41,7 @@ def getWarnings(string):
     warnings.append(string[index:findex])
     return warnings
 
-##Class that represents a Maude process. 
+##Class that represents a Maude process.
 ##Atributes:
 ##p: the Maude process
 ##f: the output file of the Maude process
@@ -57,8 +57,16 @@ class MaudeProcess:
         self.output=""
         self.t=0.01
         # define f as a temporal file
-        self.f = tempfile.TemporaryFile() 
+        self.f = tempfile.TemporaryFile()
         # start Maude process, redirect stdout and stderr to f
+        self.p = subprocess.Popen(["(cat) | ./Maude/maude.linux64"],
+                         stdout=self.f,
+                         stderr=subprocess.STDOUT,
+                         stdin=PIPE,
+                         shell=True,
+                         bufsize=0)
+    def renewProcess(self):
+        self.p.kill()
         self.p = subprocess.Popen(["(cat) | ./Maude/maude.linux64"],
                          stdout=self.f,
                          stderr=subprocess.STDOUT,
@@ -68,33 +76,44 @@ class MaudeProcess:
     def run(self,command):
         # send the command to the Maude process p
         self.p.stdin.write(command)
-        self.f.seek(0) 
+        self.f.seek(0)
         # read the output file of the Maude process
         r=self.f.read()
         # wait the output of the process, if is successful or have warnings
-        while (not ("result" in r or "Warning" in r)):
+        i=0
+        while (i<200 and not ("result" in r or "Warning" in r)):
             time.sleep(self.t)
             self.f.seek(0)
             r=self.f.read()
+            i+=1
         self.f.seek(0)
-        # erase the content of the output file
+        #erase the content of the output file
         self.f.truncate()
-        # store the output r in the atribute output
-        self.output=r
-    def getOutput(self):
-        index=self.output.find("result")
-        if index==-1:
-            index=self.output.find("Warning")
-            result=self.output[index:]
-            findex=result.find("Maude")
-            result=getWarnings(result[:findex])
-            status="error"
+        if i==200:
+            self.renewProcess()
+            self.output="timeout"
         else:
-            result=self.output[index:]
-            findex=result.find("Maude")
-            result=erraseMaudeSpaces(result[:findex])
-            status="ok"
+            # store the output r in the atribute output
+            self.output=r
+    def getOutput(self):
+        if self.output=="timeout":
+            status="error"
+            result=["timeout"]
+        else:
+            index=self.output.find("result")
+            if index==-1:
+                index=self.output.find("Warning")
+                result=self.output[index:]
+                findex=result.find("Maude")
+                result=getWarnings(result[:findex])
+                status="error"
+            else:
+                result=self.output[index:]
+                findex=result.find("Maude")
+                result=erraseMaudeSpaces(result[:findex])
+                status="ok"
         return [status,result,self.output]
+
 ##
 
 

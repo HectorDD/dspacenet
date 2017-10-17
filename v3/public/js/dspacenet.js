@@ -9,7 +9,7 @@
   var recipient = {
     id:0,
     user:""
-  }
+  };
 
   function submitForm(action) {
     var config = action ? action : $('#config').val();
@@ -31,6 +31,15 @@
       $('#errormessage').show();
     });
   }
+
+  function updatePrivateMessagesList() {
+    $.get('/api/message/'+recipient.id).done(function (data) {
+      $('#privateMessagesContainer').empty().append(data.messagesTo.map(function (message) {
+        var html = '<div id="'+ (message.user_msg === recipient.user ? 'onemessagefrom' : 'onemessageto') + '">' + message.msg+' [pid:'+message.clock+']</di>';
+        return $(html);
+      }));
+    });
+  }
   $('#programform').submit(function (event) {
     event.preventDefault();
     submitForm();
@@ -38,16 +47,11 @@
   });
   $('#privatesForm').submit(function (event) {
     event.preventDefault();
+    if (recipient.user === "") return false;
     $.post('/api/message/'+recipient.id,{
       message:$("#message").val()
-    }).then(function (data) { return $.get('/api/message/'+recipient.id).promise() })
-      .then(function (data) {
-        $('#dmessages').empty().append(data.messagesFrom.concat(data.messagesTo).sort(function (a,b) {
-          return a.clock > b.clock;
-        }).each(function (message) {
-          $('<div id="onemessagefrom">' + message.msg+' [pid:'+message.clock+']</di>');
-        }));
-      });
+    }).done(function () { updatePrivateMessagesList() })
+      .fail(function () { alert("Somithing went wrong while sending the privateMessage")} );
     return false;
   });
   $('#runsccp').off();
@@ -58,5 +62,7 @@
   $(".messageButton").click(function () {
     recipient.id = $(this).attr("data-recipient-id");
     recipient.user = $(this).attr("data-recipient");
+    $("#messageRecipient").text(" to "+recipient.user);
+    updatePrivateMessagesList();
   })
 })(jQuery);
