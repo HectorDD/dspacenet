@@ -68,7 +68,6 @@ class MaudeProcess:
                          bufsize=0)
     def renewProcess(self):
         processid = str(self.p.pid)
-        print "this is the pid" + processid
         os.system("kill -9 "+processid)
         self.p = subprocess.Popen(["(cat) | ./Maude/maude.linux64"],
                          stdout=self.f,
