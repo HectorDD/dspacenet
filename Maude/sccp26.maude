@@ -419,7 +419,6 @@ mod SYNTAX4SOCIALNET is
  op post(_) : Const -> SpaInstruc [strat (0) prec 30] .
  op fpost(_) : Const -> SpaInstruc [strat (0) prec 30] .
  op ppost(_) : Const -> SpaInstruc [strat (0) prec 30] .
- op npost(_) :  Const -> SpaInstruc [strat (0) prec 30] .
  op repeat_ : SpaInstruc -> SpaInstruc [strat (0) prec 30] .
  op whenever_do_ : Const SpaInstruc -> SpaInstruc [prec 30] .
  op until_do_ : Const SpaInstruc -> SpaInstruc [prec 30] .
@@ -430,7 +429,6 @@ mod SYNTAX4SOCIALNET is
  op say(_) : Const -> SpaInstruc [strat (0) prec 30] .
  op kill(_) : Const -> SpaInstruc [strat (0) prec 30] .
  op fkill(_) : Const -> SpaInstruc [strat (0) prec 30] .
- op nkill(_) : Const -> SpaInstruc [strat (0) prec 30] .
  op kill-pid :  -> Const .
  op kill-all : -> Const .
  op kill-posts : -> Const .
@@ -458,15 +456,10 @@ mod SYNTAX4SOCIALNET is
 --- Table of Agents
  ceq @ agent = 0 if agent = "admin" .
  ceq @ agent = 1 if agent = "hector" .
- ceq @ agent = 3 if agent = "frank" .
- ceq @ agent = 5 if agent = "camilo" .
- ceq @ agent = 7 if agent = "jason" .
- 
- ceq @ agent = 2 if agent = "top" .
- ceq @ agent = 4 if agent = "abattoir" .
-
+ ceq @ agent = 2 if agent = "frank" .
+ ceq @ agent = 3 if agent = "camilo" .
+ ceq @ agent = 42 if agent = "abattoir" .
  eq  @ agent = -1 [owise]  .  
-
 
  eq header = "<" .  *   .
 
@@ -476,21 +469,15 @@ mod SYNTAX4SOCIALNET is
  eq kill-proc-cond = kill-pid v kill-all .
  eq kill-pid = "{k:pid}" .
 
- ceq nkill(c) = enter @ "abattoir" do tell(kill-all) if c = "all" .
- ceq nkill(c) = enter @ "abattoir" do tell(kill-posts) || tell(kill-pid) if c = "posts" .
- ---ceq nkill(c) = enter @ "abattoir" do tell("{k:" + c + "}") ||  tell(kill-pid) if c =/= "all" /\ c =/= "posts" .
- ceq nkill(c) = ( enter @ "abattoir" do tell("{k:" + c + "}") ) || ( enter @ "top" do enter @ "abattoir" do ( tell("{k:" + c + "}") || tell(kill-pid)) ) if c =/= "all" /\ c =/= "posts" .
- 	
  ceq fkill(c) = enter @ "abattoir" do tell(kill-all) if c = "all" .
  ceq fkill(c) = enter @ "abattoir" do tell(kill-posts) || tell(kill-pid) if c = "posts" .
- ceq fkill(c) = ( enter @ "abattoir" do tell("{k:" + c + "}") ) || ( enter @ "top" do enter @ "abattoir" do (tell("{k:" + c + "}") || tell(kill-pid)) ) if c =/= "all" /\ c =/= "posts" .
+ ceq fkill(c) = enter @ "abattoir" do tell("{k:" + c + "}") || tell(kill-pid) if c =/= "all" /\ c =/= "posts" .
 
  ceq kill(c) = tell(kill-all) if c = "all" .
  ceq kill(c) = tell(kill-posts) || tell(kill-pid) if c = "posts" .
  ceq kill(c) = tell("{k:" + c + "}") || tell(kill-pid) if c =/= "all" /\ c =/= "posts" .
 
 
- eq npost(c) = tell(c) .
 
  eq post(c)  = rec 'vpost in ( tell(c) ||
                     unless kill-post-cond next v('vpost) ) .
@@ -552,7 +539,7 @@ endm
 mod MEMORYKILL is
  inc SCCP-SYMBOLS .
  inc STRPAT-META .
- inc SYNTAX4SOCIALNET . 
+ 
  op memkill : Cloud -> Cloud .
  op auxmemkill : ConstSet ConstSet -> ConstSet .
  op forestkill : ForestConstSet Nat -> ForestConstSet . 
@@ -569,7 +556,7 @@ mod MEMORYKILL is
  var N : Nat .
 
  eq getTree(T , N) = root((T) ^ N) . 
- eq memkill(R[F]) =  auxmemkill(R,getTree(R[F],@ "abattoir"))[ forestkill(F,@ "abattoir")] .
+ eq memkill(R[F]) =  auxmemkill(R,getTree(R[F],2))[ forestkill(F,2) ] .
  
  eq forestkill(T : F, s(N)) = memkill(T) : forestkill(F, N) .
  eq forestkill(C[F1] : F, 0) = empty[F1] : auxforestkill(F)  .
@@ -594,7 +581,7 @@ mod MEMORYKILL is
  eq match(P,S) = false [owise] . 
 endm
 
----red in MEMORYKILL : memkill(("<14 > sdasdd", "<12>asdkjajdsa", "<13>ajhsdjahsd")[empty[empty-forest] : empty[empty-forest] : "{k:12}"[empty-forest] : empty-forest]) .
+red in MEMORYKILL : memkill(("<14 > sdasdd", "<12>asdkjajdsa", "<13>ajhsdjahsd")[empty[empty-forest] : empty[empty-forest] : "{k:12}"[empty-forest] : empty-forest]) .
 ---red in MEMORYKILL : auxmemkill(("<14 > sdasdd", "<12>asdkjajdsa", "<13>ajhsdjahsd"),("{k:17}" , "{k:13}")) .
 ---red in MEMORYKILL : match("<12|hectorblabla> aksasahs","<123") .
 ---red ascii("1") .

@@ -7,6 +7,7 @@
 ---- Module for Naive String Pattern Matching: The string S matches the pattern P iff (S | P) =>* ("" | "").
 
 mod STRING-PATTERN is
+ pr EXT-BOOL .
  pr STRING .
  sort Pattern .
  subsort String < Pattern .
@@ -38,6 +39,13 @@ mod STRING-PATTERN is
  eq car(? . P) = ? .
  eq cdr(? . P) = P .
 
+ ***(
+   it is desirable to fully define car and cdr for
+   the remaining constructors of the sort Pattern.
+   If this is not the case, then either: (i) use subsort 
+   structure or (ii) use owise constructs
+ ***)
+
  ceq strcar(S) = substr(S,0,1) if S =/= "" .
  ceq strcdr(S) = substr(S,1,length(S)) if S =/= "" .
 ---------------
@@ -51,58 +59,53 @@ eq P v P = P .
 ---Pattern Matching Rules
 
  crl [stringsymbols]:
-  ( S | P )  =>  ( strcdr(S) | cdr(P) )
-  if
-  strcar(S) == car(P) /\
-  S =/= ""
-  /\
-  P =/= ""  .
+     ( S | P )
+  => ( strcdr(S) | cdr(P) )
+  if S =/= "" and-then  (P =/= "" and-then strcar(S) == car(P)) .
 
-
- rl [starsymbolcase0]:
-  ( S | *  )  =>  ( S |  "" ) .
+  rl [starsymbolcase0]:
+     ( S | *  )
+  => ( S |  "" ) .
 
  crl [starsymbolcasen]:
-  ( S | *  )  =>  ( strcdr(S) | * )
-  if
-  S =/= ""
-  .
+     ( S | *  )
+  => ( strcdr(S) | * )
+  if S =/= "" .
 
  crl [anysymbol]:
-  ( S | ?  )  =>  ( strcdr(S) | "" )
-  if
- S =/= ""
-  .
-
+     ( S | ?  )
+  => ( strcdr(S) | "" )
+  if S =/= "" .
 
  crl [concat]:
-  ( S | P . Q )  => ( S' | Q )
-  if
- S =/= ""  /\   P =/= ""  /\ Q =/= ""  /\  ( S | P )  =>  ( S' | "" )
-  .
+     ( S | P . Q )
+  => ( S' | Q )
+  if S =/= ""  and-then  (P =/= "" and-then Q =/= "")
+  /\ ( S | P )  =>  ( S' | "" ) .
 
+ crl [or]:
+     ( S | (P v Q) )
+  => ( S | P )
+  if S =/= "" .
 
-crl [or]:
-  ( S | (P v Q) )  =>  ( S | P )
-  if
- S =/= ""
-  .
+ crl [and]:
+     ( S | (P & Q) )
+  => ( S' | (P' & Q') )
+  if S =/= "" and-then (P =/= "" and-then Q =/= "")
+  /\ ( S | P )  =>  ( S' | P' )
+  /\ ( S | Q )  =>  ( S' | Q' ) .
 
-crl [and]:
-  ( S | (P & Q) )  =>  ( S' | (P' & Q') )
-  if
- S =/= "" /\   P =/= ""  /\ Q =/= "" /\  ( S | P )  =>  ( S' | P' ) /\ ( S | Q )  =>  ( S' | Q' )
-  .
+  rl [staroperatorcase0]:
+     ( S | [ P ]* )
+  => ( S |  ""  ) .
 
- rl [staroperatorcase0]:
-  ( S | [ P ]* )  =>  ( S |  ""  ) .
+  rl [staroperatorcasen]:
+     ( S | [ P ]* )
+  => ( S |  P . [ P ]*  ) .
 
- rl [staroperatorcasen]:
-  ( S | [ P ]* )  =>  ( S |  P . [ P ]*  ) .
-
- eq number = [ "0" v "1" v "2" v "3" v "4" v "5" v "6" v "7" v "8" v "9" ]* .
-
-
+ ***( can a number be an empty sequence of digits ***)
+ eq number
+  = [ "0" v "1" v "2" v "3" v "4" v "5" v "6" v "7" v "8" v "9" ]* .
 
 endm
 -----------------
@@ -115,7 +118,6 @@ mod CONST is
  sort Const .
  pr STRING-PATTERN .
  subsort Pattern < Const .
-
 endm
 ----------------
 
@@ -132,12 +134,9 @@ endv
 
 ----Module that implements the store as a gen-tree of sets of constraints.
 mod CLOUD is
----??BOOL??
- pr BOOL .
- sort Cloud .
  pr INT .
  pr CONST .
-
+ sort Cloud .
  pr SET{Const} * (sort NeSet{Const} to NeConstSet, sort Set{Const} to ConstSet) .
  inc GEN-TREE{ConstSet} * (sort Tree{ConstSet} to TreeConstSet, sort Forest{ConstSet} to ForestConstSet) .
 
@@ -161,16 +160,24 @@ mod CLOUD is
  op auxreplace : TreeConstSet TreeConstSet Int -> ForestConstSet .
  ---
 
- vars tc t : TreeConstSet .
+ var C           : Cloud .
+ vars N NC       : Const .
+ var NS          : ConstSet .
  vars T T1 OF NF : ForestConstSet .
- vars N NC : Const .
- var NS : ConstSet .
- var C : Cloud .
- vars N1 NC1 : Int .
- var i : Nat .
+ vars N1 NC1     : Int .
+ var i           : Nat .
+ vars tc t       : TreeConstSet .
 
  ---NF: New Forest, OF: Old Forest
- ---Auxiliar functions
+ ---Auxiliary functions
+
+ ***(
+     It seems that these equations are working because Colombia made
+     it to Russia.  They seem to fail the confluence test. They can be
+     fixed by using an improved version of the sort structure. It can
+     also be solved as in definition of length in gen-tree.maude
+ ***)
+
  eq withoutlast(t : empty-forest) = empty-forest .
  eq withoutlast(t : T) = t : withoutlast(T) .
  eq lastelement(t : empty-forest) = t .
@@ -183,9 +190,21 @@ mod CLOUD is
 
  eq expandforest(OF,NF,0) = mergeforest(OF,NF) .
  eq expandforest(OF,NF,s(N1)) = expandforest(OF,empty[empty-forest] : NF,N1) .
- ceq howmanychildren(N1,NC1) = 0 if NC1 > N1 .
+ eq howmanychildren(N1,NC1)
+  = max(0,NC1 - N1) .
+ ***(
+ceq howmanychildren(N1,NC1) = 0 if NC1 > N1 .
  eq howmanychildren(N1,NC1) = (N1 - NC1) + 1 .
- eq auxreplace(tc,t,N1) = replace(expandforest(children(tc),empty-forest,howmanychildren(N1,#children(tc))),t,N1) .
+ ***)
+ 
+eq auxreplace(tc,t,N1)
+ = replace(expandforest(children(tc),
+                        empty-forest,
+		        howmanychildren(N1,#children(tc))
+		       ),t,N1) .
+ ---cro The type of find cannot be from a set: sets have no order and thus
+ ---cro indexing a set does not make sense. It should use, e.g., a Forest which
+ ---cro is a list
  eq find(t : T, 0) = t .
  eq find(t : T, s(N1)) = find(T,N1) .
  eq auxfind(t,N1) = find(expandforest(children(t),empty-forest,howmanychildren(N1,#children(t))),N1) .
@@ -208,8 +227,6 @@ mod SPAINSTRUC is
  sort SpaInstruc .
  pr QID .
  pr CONST .
-
-
 
  ---Defining the structure of the spatial instructions
  op tell(_) : Const -> SpaInstruc [ctor] .
@@ -238,12 +255,19 @@ mod SPAINSTRUC is
  eq replaceVar(ask c then P1,X,P3) = ask c then replaceVar(P1,X,P3) .
  eq replaceVar(tell(c),X,P3) = tell(c) .
  eq replaceVar(skip,X,P3) = skip .
+ ***(
  eq replaceVar(v(X), X ,P3) = P3 .
- ceq replaceVar(v(X), X1 ,P3) = v(X) if X =/= X1 .
+ceq replaceVar(v(X), X1 ,P3) = v(X) if X =/= X1 .
+ ***)
+ eq replaceVar(v(X), X1, P3)
+  = if X == X1
+    then P3
+    else v(X)
+    fi .
  eq replaceVar(s(P1,i), X , P3) = s(replaceVar(P1,X,P3),i) .
  eq replaceVar(x(P1,i),X,P2) = x(replaceVar(P1,X,P2),i) .
  eq replaceVar(rec X in P1, X, P2) = rec X in P1 .
- ceq replaceVar(rec X1 in P1, X, P2) = rec X1 in replaceVar(P1, X , P2) if X1 =/= X  .
+ceq replaceVar(rec X1 in P1, X, P2) = rec X1 in replaceVar(P1, X , P2) if X1 =/= X  .
  eq replaceVar(unless c next P1,X,P3) = unless c next replaceVar(P1,X,P3) .
  eq replaceVar(next P1,X,P3) = next replaceVar(P1,X,P3) .
  ---
@@ -251,6 +275,10 @@ mod SPAINSTRUC is
 --- Structural Rules ---
 
 eq  P || P = P .
+***(
+    It can be better in terms of both performance and style to
+    define || modulo AC with identity skip ...
+***)
 eq  P || skip = P .
 eq  rec X in skip  = skip .
 
@@ -297,9 +325,33 @@ mod STRPAT-DEDUC is
  op deduc : String Pattern -> Deduc .
  op error : -> Deduc .
 
+ ***(
+    A different approach is to avoid mixing the object level with
+    the metalevel by: defining an equatioanlly defined function
+    symbol encapsulating the call to an oracle (in this case a solution
+    to the pattern matching problem) and hide the metalevel interaction
+    in such a definition.
+
+    In the case of deduct below, the choice should be metaSearch
+    instead of metaRewrite.
+ ***)
  crl [deduc] :
   deduc(S,P) => true if
   ( S | P ) => ( "" | "" ) .
+ op deduct-aux : String Pattern -> Bool .
+***(
+ pr META-LEVEL .
+ eq deduct-aux(S,P)
+  = metaSearch(
+      upModule('STRPAT-DEDUC, false),
+      upTerm((S | P)),
+      upTerm(("" | "")),
+      nil,
+      '*,
+      unbounded,
+      0)
+      =/= failure .
+***)
 endm
 
 mod STRPAT-META is
@@ -419,7 +471,6 @@ mod SYNTAX4SOCIALNET is
  op post(_) : Const -> SpaInstruc [strat (0) prec 30] .
  op fpost(_) : Const -> SpaInstruc [strat (0) prec 30] .
  op ppost(_) : Const -> SpaInstruc [strat (0) prec 30] .
- op npost(_) :  Const -> SpaInstruc [strat (0) prec 30] .
  op repeat_ : SpaInstruc -> SpaInstruc [strat (0) prec 30] .
  op whenever_do_ : Const SpaInstruc -> SpaInstruc [prec 30] .
  op until_do_ : Const SpaInstruc -> SpaInstruc [prec 30] .
@@ -430,7 +481,6 @@ mod SYNTAX4SOCIALNET is
  op say(_) : Const -> SpaInstruc [strat (0) prec 30] .
  op kill(_) : Const -> SpaInstruc [strat (0) prec 30] .
  op fkill(_) : Const -> SpaInstruc [strat (0) prec 30] .
- op nkill(_) : Const -> SpaInstruc [strat (0) prec 30] .
  op kill-pid :  -> Const .
  op kill-all : -> Const .
  op kill-posts : -> Const .
@@ -458,15 +508,10 @@ mod SYNTAX4SOCIALNET is
 --- Table of Agents
  ceq @ agent = 0 if agent = "admin" .
  ceq @ agent = 1 if agent = "hector" .
- ceq @ agent = 3 if agent = "frank" .
- ceq @ agent = 5 if agent = "camilo" .
- ceq @ agent = 7 if agent = "jason" .
- 
- ceq @ agent = 2 if agent = "top" .
- ceq @ agent = 4 if agent = "abattoir" .
-
+ ceq @ agent = 2 if agent = "frank" .
+ ceq @ agent = 3 if agent = "camilo" .
+ ceq @ agent = 42 if agent = "abattoir" .
  eq  @ agent = -1 [owise]  .  
-
 
  eq header = "<" .  *   .
 
@@ -476,21 +521,15 @@ mod SYNTAX4SOCIALNET is
  eq kill-proc-cond = kill-pid v kill-all .
  eq kill-pid = "{k:pid}" .
 
- ceq nkill(c) = enter @ "abattoir" do tell(kill-all) if c = "all" .
- ceq nkill(c) = enter @ "abattoir" do tell(kill-posts) || tell(kill-pid) if c = "posts" .
- ---ceq nkill(c) = enter @ "abattoir" do tell("{k:" + c + "}") ||  tell(kill-pid) if c =/= "all" /\ c =/= "posts" .
- ceq nkill(c) = ( enter @ "abattoir" do tell("{k:" + c + "}") ) || ( enter @ "top" do enter @ "abattoir" do ( tell("{k:" + c + "}") || tell(kill-pid)) ) if c =/= "all" /\ c =/= "posts" .
- 	
  ceq fkill(c) = enter @ "abattoir" do tell(kill-all) if c = "all" .
  ceq fkill(c) = enter @ "abattoir" do tell(kill-posts) || tell(kill-pid) if c = "posts" .
- ceq fkill(c) = ( enter @ "abattoir" do tell("{k:" + c + "}") ) || ( enter @ "top" do enter @ "abattoir" do (tell("{k:" + c + "}") || tell(kill-pid)) ) if c =/= "all" /\ c =/= "posts" .
+ ceq fkill(c) = enter @ "abattoir" do tell("{k:" + c + "}") || tell(kill-pid) if c =/= "all" /\ c =/= "posts" .
 
  ceq kill(c) = tell(kill-all) if c = "all" .
  ceq kill(c) = tell(kill-posts) || tell(kill-pid) if c = "posts" .
  ceq kill(c) = tell("{k:" + c + "}") || tell(kill-pid) if c =/= "all" /\ c =/= "posts" .
 
 
- eq npost(c) = tell(c) .
 
  eq post(c)  = rec 'vpost in ( tell(c) ||
                     unless kill-post-cond next v('vpost) ) .
@@ -549,61 +588,6 @@ mod NTCCPLUS+ is
 
 endm
 
-mod MEMORYKILL is
- inc SCCP-SYMBOLS .
- inc STRPAT-META .
- inc SYNTAX4SOCIALNET . 
- op memkill : Cloud -> Cloud .
- op auxmemkill : ConstSet ConstSet -> ConstSet .
- op forestkill : ForestConstSet Nat -> ForestConstSet . 
- op auxforestkill : ForestConstSet -> ForestConstSet .
- op elimpid : ConstSet String -> ConstSet . 
- op getpid : String -> String .
- op getTree : TreeConstSet Nat -> ConstSet .
- op match : String String -> Bool .
-
- vars R C : ConstSet .
- vars F F1 : ForestConstSet .
- vars T T2 : TreeConstSet .
- vars S P : String . 
- var N : Nat .
-
- eq getTree(T , N) = root((T) ^ N) . 
- eq memkill(R[F]) =  auxmemkill(R,getTree(R[F],@ "abattoir"))[ forestkill(F,@ "abattoir")] .
- 
- eq forestkill(T : F, s(N)) = memkill(T) : forestkill(F, N) .
- eq forestkill(C[F1] : F, 0) = empty[F1] : auxforestkill(F)  .
- eq forestkill(empty-forest, N) = empty-forest .
- eq auxforestkill(T : F) = T : auxforestkill(F) .
- eq auxforestkill(empty-forest) = empty-forest .
-
-
- 
- ceq elimpid((S,C),P) = elimpid(C,P) if S |- "<" . getpid(P) . * . ">" . *  .
- eq elimpid(C,P) = C [owise] .
- ceq getpid(S) = "" if S == "" .
- ceq getpid(S) = substr(S,0,1) + getpid(substr(S,1,length(S))) if ascii(substr(S,0,1)) > 47 /\ ascii(substr(S,0,1)) < 58 .
- eq getpid(S) = getpid(substr(S,1,length(S))) [owise] .
- 
- eq auxmemkill(empty,R) = empty .
- eq auxmemkill(R,empty) = R .
- ceq auxmemkill((P,R),(S,C)) = auxmemkill(R,(S,C)) if match(P,"<" + getpid(S))  .
- eq auxmemkill(R,C) = R [owise] .
-
- ceq match(P,S) = true if substr(P,0,length(S)) == S .
- eq match(P,S) = false [owise] . 
-endm
-
----red in MEMORYKILL : memkill(("<14 > sdasdd", "<12>asdkjajdsa", "<13>ajhsdjahsd")[empty[empty-forest] : empty[empty-forest] : "{k:12}"[empty-forest] : empty-forest]) .
----red in MEMORYKILL : auxmemkill(("<14 > sdasdd", "<12>asdkjajdsa", "<13>ajhsdjahsd"),("{k:17}" , "{k:13}")) .
----red in MEMORYKILL : match("<12|hectorblabla> aksasahs","<123") .
----red ascii("1") .
----red in MEMORYKILL : elimpid(("<12|hector>hey","lala") , "{k:12}") .
----red substr("{k:1212}", 1 , length("{k:1212}")) .
----red in MEMORYKILL : getpid("{k:1212}") .
----red in MEMORYKILL : elimpid(empty,"{k:100}") .
-
----rew in MEMORYKILL : "hey"[empty[empty-forest] : "{k:100}"[empty-forest] : empty-forest] .
 mod SCCP-RUN is
   pr SYNTAX4SOCIALNET .
 
@@ -624,14 +608,12 @@ endm
 mod NTCC-RUN is
  pr NTCCPLUS+ .
  pr SCCP-META .
- pr MEMORYKILL .
-
  vars P Q : SpaInstruc .
  vars M N : Cloud .
 
  op IO : Conf -> Conf .
 
- ceq IO(< P ; M >) = < f(Q,N) ; memkill(N) > if < Q ; N > := sccp*(< P ; M >) .
+ ceq IO(< P ; M >) = < f(Q,N) ; N > if < Q ; N > := sccp*(< P ; M >) .
 endm
 
 mod U2N is

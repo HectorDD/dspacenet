@@ -407,7 +407,7 @@ def runsccp():
     received = addPid(received)
     received = addPidPosted(received)
     processes = received +" || " + processes
-    maude.run("red in NTCC-RUN : IO(< "+processes+" ; empty[empty-forest] >) . \n")
+    maude.run("red in NTCC-RUN : IO(< "+processes+" ; "+memory+" >) . \n")
     answer=maude.getOutput()
     if answer[0]=="error":
         errors=errorToJson(answer[1])

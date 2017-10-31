@@ -32,7 +32,7 @@ router.get('/wall/', (req, res) => {
 
 router.post('/wall/', (req, res) => {
   const program = req.body.config === 'skip' ? 'skip' :
-    `${req.body.config} ||  tell("{pid:{pid}|${req.session.user}} ${req.body.config.replace(/"/g,'\'')}")`;
+    `${req.body.config} || repeat tell("{pid:{pid}|${req.session.user}} ${req.body.config.replace(/"/g,'\'')}")`;
   sccpClient.post('/runsccp',{
     config: embed(program,req.session.id_user),
     user: req.session.user
@@ -89,7 +89,7 @@ router.post('/space/:path', (req, res) => {
       req.body.program :
     req.body.program === 'skip' ?
       'skip' :
-      `${req.body.program} || enter @ "top" do tell("<{pid}|${req.session.user}> ${req.body.program.replace(/"/g,'\'')}")`;
+      `${req.body.program} || repeat tell("{pid:{pid}|${req.session.user}} ${req.body.program.replace(/"/g,'\'')}")`;
   sccpClient.post('/runsccp',{
     config: spaceWrap(program, path),
     user: req.session.user

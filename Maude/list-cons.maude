@@ -38,4 +38,3 @@
     eq throw N from [] = [] .
     eq throw s(N) from (E : L) = throw N from L .
   endfm
-    

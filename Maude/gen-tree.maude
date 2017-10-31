@@ -5,6 +5,11 @@
 
     sorts Tree{X} Forest{X} .
 
+    ***(
+      It is better to have sorts distinguishing between empty and non-empty
+      forest. The reason is that it can help in defining the functions on
+      the data types in a clearer way.
+    ***)  
     op _[_] : X$Elt Forest{X} -> Tree{X} [ctor] .
     op empty-forest : -> Forest{X} [ctor] .
     op _:_ : Tree{X} Forest{X} -> Forest{X} [ctor] .
