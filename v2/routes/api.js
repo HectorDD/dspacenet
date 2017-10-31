@@ -73,6 +73,17 @@ router.get('/message/:recipient/', (req, res) => {
   });
 });
 
+router.get('/space/:path', (req, res) => {
+  sccpClient.post('/getSpace', { id: req.params.path }, (err, res2, body) => {
+    if (err) {
+      res.status(504).json({error: err});
+    } else {
+      res.json(body.result);
+    }
+    res.end();
+  });
+});
+
 router.get('/space/wall/:spaceId',(req, res) => {
   sccpClient.post('/getWall', { id: req.params.spaceId }, (err, res2, body) => {
     if (err)

@@ -293,6 +293,15 @@ def calculateAgentMemory(agentId):
 
     return agents
 
+def calculateAgentMemoryAlpha(store,agentId):
+    parsingResult=parse("{}[{}]", store)
+    agents=parsingResult[1]
+    while agentId>0:
+        agents=elimOther(agents)
+        agentId=agentId-1
+    agents=getCurrAgent(agents)
+    return agents
+
 ##Function that calculate messages on the private mailbox
 def calculateMessages(user_from,user_to):
     global memory
@@ -445,6 +454,26 @@ def getWall():
         return jsonify({'result' : rranswer})
     except:
         return jsonify({'result' : 'session error'})
+
+##This function returns the wall of an agent
+@app.route('/getSpace', methods=['POST'])
+def getSpace():
+    agent=request.json['id']
+    try:
+        answer=calculateAgentMemory(int(agent[0]))
+        agent.pop(0)
+        for i in agent:
+            answer=calculateAgentMemoryAlpha(answer,int(i))
+        paranswer=parse("{}[{}]", answer )
+        try:
+            ranswer=paranswer[0]
+            rranswer=convertMemInJson(ranswer)
+            rranswer.sort(key=lambda clock: int(clock['clock']),reverse=True)
+            return jsonify({'result' : rranswer})
+        except:
+            return jsonify({'result' : 'error1'})
+    except:
+        return jsonify({'result' : 'error2'})
 
 
 ##This function returns the posted processes on a space
