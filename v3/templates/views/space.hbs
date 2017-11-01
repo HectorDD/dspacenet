@@ -12,8 +12,14 @@
 </ol>
 <form id="runProgramForm">
   <div class="input-group mb-3">
-    <input type="text" class="form-control border-right-0" placeholder="Post your program here" autocomplete="off" id="programInput"></input>
+    {{#if ownSpace}}
+    <span class="input-group-btn">
+      <button type="button" class="btn btn-info" id="openTopBtn" data-toggle="tooltip" title="Show Runnig Process"><i class="fa fa-cogs"></i></button>
+    </span>
+    {{/if}}
+    <input type="text" class="form-control border-right-0" placeholder="Post your program here" id="programInput"></input>
     <input type="hidden" value="{{spaceId}}" id="spacePath">
+    <input type="hidden" value="{{@userId}}" id="userId">
     <span class="input-group-addon bg-white border-left-0" id="runProgramFormLoader" style="display:none">
       <i class="fa fa-cog fa-spin fa-lg fa-fw"></i>
     </span>
@@ -25,36 +31,26 @@
     </span>
   </div>
 </form>
-{{#if ownSpace}}
-<div class="row">
-  <div class="col-lg-8">
-  {{/if}}
-    <div class="card mb-3">
-      <div class="card-header">
-        <i class="fa fa-th-list"></i> Public Posts
-      </div>
-      <div class="list-group list-group-flush small" id="postsContainer">
-        <div class="list-group-item loader"></div>
-      </div>
-    </div>
-  {{#if ownSpace}}
+<div class="card mb-3">
+  <div class="card-header">
+    <i class="fa fa-th-list"></i> Public Posts
   </div>
-  <div class="col-lg-4">
-    <div class="card mb-3">
-      <div class="card-header">
-        <i class="fa fa-cogs"></i> Top
-      </div>
-      <div class="list-group list-group-flush small" id="processContainer">
-        <div class="list-group-item loader"></div>
-      </div>
-    </div>
+  <div class="list-group list-group-flush small" id="postsContainer">
+    <div class="list-group-item loader"></div>
   </div>
 </div>
-{{/if}}
+
+{{! extensions }}
 {{#extend 'scripts' }}
 <script src="/js/dspacenet.v3.js"></script>
 {{/extend}}
 
 {{#extend 'styles' }}
 <link rel="stylesheet" href="/css/dspacenet.css">
+{{/extend}}
+
+{{#extend 'modals' }}
+  {{#if ownSpace}}
+    {{> topModal}}
+  {{/if}}
 {{/extend}}

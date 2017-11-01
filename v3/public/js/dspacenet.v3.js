@@ -1,26 +1,35 @@
-/*global jQuery*/
+/* global jQuery */
 
 (($) => {
-  const $postsContainer = $("#postsContainer");
-  const $processContainer = $("#processContainer");
-  const $runProgramForm = $("#runProgramForm");
-  const $runProgramFormLoader = $("#runProgramFormLoader");
-  const $programInput = $("#programInput");
-  const $skipBtn = $("#skipBtn");
+  const $postsContainer = $('#postsContainer');
+  const $processContainer = $('#processContainer');
+  const $runProgramForm = $('#runProgramForm');
+  const $runProgramFormLoader = $('#runProgramFormLoader');
+  const $programInput = $('#programInput');
+  const $skipBtn = $('#skipBtn');
+  const $openTopBtn = $('#openTopBtn');
 
-  const space = $("#spacePath").val();
+  const $topModal = $('#topModal');
 
-  function runProgram(program, space, options) {
-    return $.post(`/api/space/${space}`, Object.assign({ program }, options)).promise();
+  const space = $('#spacePath').val();
+  const userId = $('#userId').val();
+
+  function runProgram(program, path, options) {
+    return $.post(`/api/space/${path}`, Object.assign({ program }, options)).promise();
   }
 
-  function getWall(space) {
-    return $.get(`/api/space/wall/${space}`).promise();
+  function getWall(id) {
+    return $.get(`/api/space/wall/${id}`).promise();
   }
 
-  function getGlobal(space) {
+  function getGlobal() {
     return $.get('/api/space/global').promise();
   }
+
+  function getSpace(path) {
+    return $.get(`/api/space/${path}`);
+  }
+
   function pushPost(message) {
     $postsContainer.append($(`
       <div class="list-group-item">
@@ -68,35 +77,28 @@
   function updateWall() {
     getWall(space).done((data) => {
       $postsContainer.empty();
-      $processContainer.empty();
-      data.forEach(message =>
-        message.class === "process" ?
-          pushProcess(message) :
-        message.user_msg !== "private" ?
-          pushPost(message) : null
-      );
+      data.forEach((message) => { if (message.user_msg !== 'private') pushPost(message); });
       checkPosts();
-      checkProcesses();
     }).fail((jqXHR) => {
-      console.log(jqXHR.responseJSON);
+      console.log(jqXHR.responseJSON || jqXHR.responseText);
     });
   }
 
   function updateGlobal() {
     getGlobal().done((data) => {
       $postsContainer.empty();
-      data.forEach(message => message.user_msg !== 'private' ? pushPost(message) : null);
+      data.forEach(message => (message.user_msg !== 'private' ? pushPost(message) : null));
       checkPosts();
     }).fail((jqXHR) => {
-      console.log(jqXHR.responseJSON);
+      console.log(jqXHR.responseJSON || jqXHR.responseText);
     });
   }
 
   function updateContent() {
-    space === '0' ? updateGlobal() : updateWall();
+    if (space === '0') updateGlobal(); else updateWall();
   }
 
-  function showErrorMessage (message) {
+  function showErrorMessage(message) {
     $runProgramForm.before($(`
       <div class="alert alert-danger alert-dissmisable fade show" role="alert">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -130,6 +132,15 @@
 
   $skipBtn.click(() => {
     submitRunProgramForm('skip');
+  });
+
+  $openTopBtn.click(() => {
+    getSpace(`${userId}.2`).done((data) => {
+      $processContainer.empty();
+      data.forEach(process => pushProcess(process));
+      checkProcesses();
+      $topModal.modal('show');
+    });
   });
 
   updateContent();

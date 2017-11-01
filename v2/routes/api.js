@@ -1,5 +1,3 @@
-'use strict';
-
 const router = require('express').Router();
 const request = require('request-json');
 
@@ -14,36 +12,9 @@ function embed(program, space) {
 function spaceWrap(program, path) {
   if (path === '') return program;
   let result = program;
-  `${path}`.split('.').forEach(spaceId => result = `([${result}] ${spaceId})`);
+  `${path}`.split('.').forEach(spaceId => {result = `([${result}] ${spaceId})`});
   return result;
 }
-
-router.get('/wall/', (req, res) => {
-  if (req.session.user === undefined)
-    res.json({error:'logged out'}).end();
-  else {
-    sccpClient.post('/getWall', { id: req.session.id_user }, (err, res2, body) => {
-      if (err)
-        return res.status(504).json({ success: false, error: err });
-      res.json(body.result).end();
-    });
-  }
-});
-
-router.post('/wall/', (req, res) => {
-  const program = req.body.config === 'skip' ? 'skip' :
-    `${req.body.config} ||  tell("{pid:{pid}|${req.session.user}} ${req.body.config.replace(/"/g,'\'')}")`;
-  sccpClient.post('/runsccp',{
-    config: embed(program,req.session.id_user),
-    user: req.session.user
-  }, (err, res2, body) => {
-    if (err)
-      return res.status(504).json({ success: false, error: err });
-    if (body.result !== 'error')
-      res.json({ success: true });
-    else res.status(400).json({ success: false, errors: body.errors });
-  });
-});
 
 router.post('/message/:recipient/', (req, res) => {
   var config = embed(embed(embed(req.body.message, req.session.id_user), 0), req.params.recipient);
@@ -51,11 +22,11 @@ router.post('/message/:recipient/', (req, res) => {
     config: config,
     user: req.session.user
   }, (err, res2, body) => {
-    if (err)
-      return res.status(504).json({ success: false, error: err });
-    if (body.result !== 'error')
+    if (err) {
+      res.status(504).json({ success: false, error: err });
+    } else if (body.result !== 'error') {
       res.json({ success: true });
-    else res.status(400).json({ success: false, errors: body.errors });
+    } else res.status(400).json({ success: false, errors: body.errors });
   });
 });
 
@@ -64,17 +35,28 @@ router.get('/message/:recipient/', (req, res) => {
     'user_to': req.params.recipient,
     'user_from': req.session.id_user,
   }, (err, res2, body) => {
-    if (err)
-      return res.status(504).json({ success: false, error: err });
-    res.json({
-      messagesFrom: body.messages_from,
-      messagesTo: body.messages_to
-    });
+    if (err) {
+      res.status(504).json({ success: false, error: err });
+    } else {
+      res.json({
+        messagesFrom: body.messages_from,
+        messagesTo: body.messages_to
+      });
+    }
   });
 });
 
+router.get('/space/global/' , function(req, res, next) {
+    sccpClient.get('/getGlobal', (err, res2, body) => {
+    if (err) {
+      res.status(504).json({error: err });
+    } else res.json(body.result);
+    res.end();
+    });
+});
+
 router.get('/space/:path', (req, res) => {
-  sccpClient.post('/getSpace', { id: req.params.path }, (err, res2, body) => {
+  sccpClient.post('/getSpace', { id: req.params.path.split('.') }, (err, res2, body) => {
     if (err) {
       res.status(504).json({error: err});
     } else {
@@ -86,10 +68,9 @@ router.get('/space/:path', (req, res) => {
 
 router.get('/space/wall/:spaceId',(req, res) => {
   sccpClient.post('/getWall', { id: req.params.spaceId }, (err, res2, body) => {
-    if (err)
+    if (err) {
       res.status(504).json({error: err });
-    else
-      res.json(body.result);
+    } else res.json(body.result);
     res.end();
   });
 });
@@ -105,26 +86,15 @@ router.post('/space/:path', (req, res) => {
     config: spaceWrap(program, path),
     user: req.session.user
   }, (err, res2, body) => {
-    if (err)
-      return res.status(504).json({error: err });
-    else if (body.result === "error") {
+    if (err) {
+      res.status(504).json({error: err });
+    } else if (body.result === "error") {
       let result = "";
-      body.errors.forEach(error => result = `${result} ${error.error}`);
+      body.errors.forEach(error => {result = `${result} ${error.error}`});
       res.status(400).json({error: result});
-    } else
-      res.json({ success: true });
+    } else res.json({ success: true });
     res.end();
   });
-});
-
-router.get('/space/global/' , function(req, res, next) {
-    sccpClient.get('/getGlobal', (err, res2, body) => {
-    if (err)
-      res.status(504).json({error: err });
-    else
-      res.json(body.result);
-    res.end();
-    });
 });
 
 module.exports = router;

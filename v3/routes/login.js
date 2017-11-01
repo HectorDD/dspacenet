@@ -5,9 +5,12 @@ const view = __dirname + '/../templates/views/login';
 const layout = '../v3/templates/views/layouts/simple';
 
 router.get('/',(req, res) => {
-  if (req.session.userId !== undefined)
-    res.redirect('space/global');
-  else {
+  if (req.session.userId !== undefined) {
+    if (req.query.logout !== undefined) {
+      req.session.destroy();
+      res.redirect('/');
+    } else res.redirect('space/global');
+  } else {
     const error = req.session.error;
     req.session.error = undefined;
     res.render(view, { layout, error });
