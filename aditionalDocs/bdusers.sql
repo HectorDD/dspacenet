@@ -8,14 +8,14 @@ CREATE TABLE users
 
 CREATE TABLE friends
 (
-  id_user1 integer NOT NULL, 
+  id_user1 integer NOT NULL,
   id_user2 integer NOT NULL,
   CONSTRAINT friends_pk PRIMARY KEY (id_user1,id_user2),
   CONSTRAINT friends_fk1 FOREIGN KEY (id_user1)
-  REFERENCES users (id_user) 
+  REFERENCES users (id_user)
   ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT friends_fk2 FOREIGN KEY (id_user2)
-  REFERENCES users (id_user) 
+  REFERENCES users (id_user)
   ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 

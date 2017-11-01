@@ -48,7 +48,11 @@
     $processContainer.append($(`
       <div class="list-group-item list-group-item-action flex-column align-items-start">
         <div class="d-flex w-100 justify-content-between">
-          <p class="mb-0 text-break">${message.msg}</p>
+          <p class="mb-0 text-break">
+          <strong>${message.user_msg}</strong> ${message.msg}
+          <div class="text-muted smaller">PID: ${message.clock}</div>
+
+          </p>
         </div>
       </div>
     `));
