@@ -1,4 +1,3 @@
-
 from flask import Flask, jsonify, request
 from parse import *
 from maude import *
@@ -73,23 +72,9 @@ def translateProcess(process):
     return resultvar
 
 ##Function for adding the program id to new process
-#def addPid(program):
-#  global ntcctime
-#  pidstr='<pid|'
-#  index=program.find(pidstr)
-#  oldindex=0
-#  while index!=-1:
-#      index=oldindex+index+1
-#      pid=str(ntcctime)
-#      program=program[:index]+pid+program[index+3:]
-#      oldindex=index+len(pid)
-#      index=program[oldindex:].find(pidstr)
-#  return program
-
-##Function for adding the program id to new process
 def addPid(program):
   global ntcctime
-  pidstr='<pid|'
+  pidstr=''
   index=program.find(pidstr)
   oldindex=0
   while index!=-1:
@@ -99,7 +84,6 @@ def addPid(program):
       oldindex=index+len(pid)
       index=program[oldindex:].find(pidstr)
   return program
-
 
 ##Function for replacing {pid} with the current ntcc clock
 def addPidPosted(program):
