@@ -478,7 +478,8 @@ mod SYNTAX4SOCIALNET is
 
  ceq nkill(c) = enter @ "abattoir" do tell(kill-all) if c = "all" .
  ceq nkill(c) = enter @ "abattoir" do tell(kill-posts) || tell(kill-pid) if c = "posts" .
- ceq nkill(c) =  ( enter @ "abattoir" do tell(c) ) || ( enter @ "top" do enter @ "abattoir" do ( tell(c) || tell("<pid|" . *)) ) if c =/= "all" /\ c =/= "posts" .
+ ---ceq nkill(c) = enter @ "abattoir" do tell("{k:" + c + "}") ||  tell(kill-pid) if c =/= "all" /\ c =/= "posts" .
+ ceq nkill(c) = ( enter @ "abattoir" do tell("{k:" + c + "}") ) || ( enter @ "top" do enter @ "abattoir" do ( tell("{k:" + c + "}") || tell(kill-pid)) ) if c =/= "all" /\ c =/= "posts" .
  	
  ceq fkill(c) = enter @ "abattoir" do tell(kill-all) if c = "all" .
  ceq fkill(c) = enter @ "abattoir" do tell(kill-posts) || tell(kill-pid) if c = "posts" .
@@ -489,9 +490,7 @@ mod SYNTAX4SOCIALNET is
  ceq kill(c) = tell("{k:" + c + "}") || tell(kill-pid) if c =/= "all" /\ c =/= "posts" .
 
 
- 
- 
-eq npost(c) = tell(c) .
+ eq npost(c) = tell(c) .
 
  eq post(c)  = rec 'vpost in ( tell(c) ||
                     unless kill-post-cond next v('vpost) ) .
@@ -566,9 +565,9 @@ mod MEMORYKILL is
  vars R C : ConstSet .
  vars F F1 : ForestConstSet .
  vars T T2 : TreeConstSet .
- var S  : String . 
+ vars S P : String . 
  var N : Nat .
- var P : Const .
+
  eq getTree(T , N) = root((T) ^ N) . 
  eq memkill(R[F]) =  auxmemkill(R,getTree(R[F],@ "abattoir"))[ forestkill(F,@ "abattoir")] .
  
@@ -580,16 +579,15 @@ mod MEMORYKILL is
 
 
  
---- ceq elimpid((S,C),P) = elimpid(C,P) if S |- "<" . getpid(P) . * . ">" . *  .
---- eq elimpid(C,P) = C [owise] .
+ ceq elimpid((S,C),P) = elimpid(C,P) if S |- "<" . getpid(P) . * . ">" . *  .
+ eq elimpid(C,P) = C [owise] .
  ceq getpid(S) = "" if S == "" .
  ceq getpid(S) = substr(S,0,1) + getpid(substr(S,1,length(S))) if ascii(substr(S,0,1)) > 47 /\ ascii(substr(S,0,1)) < 58 .
  eq getpid(S) = getpid(substr(S,1,length(S))) [owise] .
  
  eq auxmemkill(empty,R) = empty .
  eq auxmemkill(R,empty) = R .
- ---ceq auxmemkill((P,R),(S,C)) = auxmemkill(R,(S,C)) if match(P,"<" + getpid(S))  .
- ceq  auxmemkill((S,R),(P,C)) = auxmemkill(R,(P,C)) if S |- P  .
+ ceq auxmemkill((P,R),(S,C)) = auxmemkill(R,(S,C)) if match(P,"<" + getpid(S))  .
  eq auxmemkill(R,C) = R [owise] .
 
  ceq match(P,S) = true if substr(P,0,length(S)) == S .
