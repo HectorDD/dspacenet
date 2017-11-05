@@ -1,6 +1,8 @@
 /* global jQuery */
 
 (($) => {
+  const pollingInterval = 1000;
+
   const $postsContainer = $('#postsContainer');
   const $processContainer = $('#processContainer');
   const $runProgramForm = $('#runProgramForm');
@@ -101,6 +103,14 @@
     if (space === '0') updateGlobal(); else updateWall();
   }
 
+  function startPolling() {
+    if (space === '0') {
+      setInterval(updateGlobal, pollingInterval);
+    } else {
+      setInterval(updateWall, pollingInterval)
+    }
+  }
+
   function showErrorMessage(message) {
     $runProgramForm.before($(`
       <div class="alert alert-danger alert-dissmisable fade show" role="alert">
@@ -150,5 +160,6 @@
     });
   });
 
+  startPolling();
   updateContent();
 })(jQuery);
