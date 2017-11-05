@@ -6,22 +6,22 @@
   </button>
   <div class="collapse navbar-collapse" id="navbarResponsive">
     <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-      <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Global Space">
+      <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Group Space">
         <a class="nav-link" href="/space/global">
           <i class="fa fa-fw fa-globe"></i>
-          <span class="nav-link-text">Global Space</span>
+          <span class="nav-link-text">Group Space</span>
         </a>
       </li>
-      <li class="nav-item hidden-xs" data-toggle="tooltip" data-placement="right" title="My Wall">
+      <li class="nav-item hidden-xs" data-toggle="tooltip" data-placement="right" title="My Public Space">
         <a class="nav-link" href="/space/{{@user}}">
           <i class="fa fa-fw fa-th-list"></i>
-          <span class="nav-link-text">My Space</span>
+          <span class="nav-link-text">My Public Space</span>
         </a>
       </li>
-      <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Friends">
+      <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Other Members">
         <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseFriends" data-parent="#exampleAccordion">
           <i class="fa fa-fw fa-users"></i>
-          <span class="nav-link-text">Friends</span>
+          <span class="nav-link-text">Other Members</span>
         </a>
         <ul class="sidenav-second-level collapse" id="collapseFriends">
           {{#if friends}}

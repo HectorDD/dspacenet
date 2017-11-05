@@ -14,12 +14,11 @@
   <div class="input-group mb-3">
     {{#if ownSpace}}
     <span class="input-group-btn">
-      <button type="button" class="btn btn-info" id="openTopBtn" data-toggle="tooltip" title="Show Runnig Process"><i class="fa fa-cogs"></i></button>
+      <button type="button" class="btn btn-info" id="openTopBtn" data-toggle="tooltip" title="Show Top"><i class="fa fa-cogs"></i></button>
     </span>
     {{/if}}
-    <input type="text" class="form-control border-right-0" placeholder="Post your program here" id="programInput"></input>
+    <input type="text" class="form-control border-right-0" placeholder="Post your program or message here" id="programInput"></input>
     <input type="hidden" value="{{spaceId}}" id="spacePath">
-    <input type="hidden" value="{{@userId}}" id="userId">
     <span class="input-group-addon bg-white border-left-0" id="runProgramFormLoader" style="display:none">
       <i class="fa fa-cog fa-spin fa-lg fa-fw"></i>
     </span>
@@ -27,7 +26,10 @@
       <button type="button" class="btn btn-secondary" id="skipBtn" data-toggle="tooltip" title="Skip"><i class="fa fa-step-forward"></i></button>
     </span>
     <span class="input-group-btn">
-      <button type="submit" class="btn btn-primary" data-toggle="tooltip" title="Run Program"><i class="fa fa-play"></i></button>
+      <button type="button" class="btn btn-secondary" id="postMsgBtn" data-toggle="tooltip" title="Post Message"><i class="fa fa-paper-plane"></i></button>
+    </span>
+    <span class="input-group-btn">
+      <button type="submit" class="btn btn-primary" data-toggle="tooltip" title="Post Program"><i class="fa fa-play"></i></button>
     </span>
   </div>
 </form>

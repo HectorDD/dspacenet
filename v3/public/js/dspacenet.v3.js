@@ -8,11 +8,11 @@
   const $programInput = $('#programInput');
   const $skipBtn = $('#skipBtn');
   const $openTopBtn = $('#openTopBtn');
+  const $postMsgBtn = $('#postMsgBtn');
 
   const $topModal = $('#topModal');
 
   const space = $('#spacePath').val();
-  const userId = $('#userId').val();
 
   function runProgram(program, path, options) {
     return $.post(`/api/space/${path}`, Object.assign({ program }, options)).promise();
@@ -122,7 +122,7 @@
       updateContent();
     }).fail((jqXHR) => {
       $runProgramFormLoader.hide();
-      console.log(jqXHR.responseJSON);
+      console.log(jqXHR.responseJSON || jqXHR.responseText);
       if (jqXHR.status === 400) showErrorMessage(jqXHR.responseJSON.error);
     });
   }
@@ -133,12 +133,16 @@
     return false;
   });
 
+  $postMsgBtn.click(() => {
+    submitRunProgramForm(`npost("${$programInput.val()}")`);
+  })
+
   $skipBtn.click(() => {
     submitRunProgramForm('skip');
   });
 
   $openTopBtn.click(() => {
-    getSpace(`${userId}.2`).done((data) => {
+    getSpace(`${space}.2`).done((data) => {
       $processContainer.empty();
       data.forEach(process => pushProcess(process));
       checkProcesses();
