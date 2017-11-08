@@ -24,6 +24,18 @@ def erraseMaudeSpaces(string):
             new+=string[i]
         i+=1
     return new
+def eraseLineandWarning(warnings):
+    new=""
+    newWarnings=[]
+    for i in warnings:
+        index=i.find("line")
+        new=i[index:]
+        index=new.find(":")
+        new=new[index:]
+        findex=new.find(".")
+        new=new[:findex]
+        newWarnings.append(new)
+    return newWarnings
 
 ##input: string with warnings inside
 ##output: list of warnings obtained from the input string
@@ -40,6 +52,7 @@ def getWarnings(string):
             string=string[findex:]
             index=string.find("Warning")
     warnings.append(string[index:findex])
+    warnings=eraseLineandWarning(warnings)
     return warnings
 
 ##Class that represents a Maude process.
