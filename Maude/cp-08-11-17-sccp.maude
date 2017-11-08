@@ -428,7 +428,6 @@ mod SYNTAX4SOCIALNET is
  op now_do_ : Const SpaInstruc -> SpaInstruc [prec 30] .
  op now_then_else_ : Const SpaInstruc SpaInstruc -> SpaInstruc [prec 30] .
  op say(_) : Const -> SpaInstruc [strat (0) prec 30] .
-
  op kill(_) : Const -> SpaInstruc [strat (0) prec 30] .
  op fkill(_) : Const -> SpaInstruc [strat (0) prec 30] .
  op nkill(_) : Const -> SpaInstruc [strat (0) prec 30] .
@@ -437,8 +436,6 @@ mod SYNTAX4SOCIALNET is
  op kill-posts : -> Const .
  op kill-post-cond : -> Const .
  op kill-proc-cond : -> Const .
- op kill-usn : -> Const .
-
  vars P P' Q : SpaInstruc .
  var i : Nat .
  vars c pid : Const .
@@ -458,46 +455,34 @@ mod SYNTAX4SOCIALNET is
 
  eq P ^ i = x(P,i ) .
 
-
---- Table of Agents (note: more effeciently as a hash table)
------- users 
+--- Table of Agents
  ceq @ agent = 0 if agent = "admin" .
  ceq @ agent = 1 if agent = "hector" .
  ceq @ agent = 3 if agent = "frank" .
  ceq @ agent = 5 if agent = "camilo" .
  ceq @ agent = 7 if agent = "jason" .
- ceq @ agent = 9 if agent = "santiago" .
-
------- special spaces (top = table of processes, abattoir = contains pids to be killed )
+ 
  ceq @ agent = 2 if agent = "top" .
  ceq @ agent = 4 if agent = "abattoir" .
 
---- error 
  eq  @ agent = -1 [owise]  .  
-
----- end Table of Agents.
-
 
 
  eq header = "<" .  *   .
 
  eq kill-all  = "{k:a}" .
  eq kill-posts = "{k:p}" .
- eq kill-pid = "<pid|" .
- eq kill-usn = "|usn>" .
- eq kill-post-cond = kill-pid v kill-usn v kill-all .
- eq kill-proc-cond = kill-pid v kill-usn v kill-all .
+ eq kill-post-cond = kill-pid v kill-all  .
+ eq kill-proc-cond = kill-pid v kill-all .
+ eq kill-pid = "{k:pid}" .
 
---- ceq nkill(c) = enter @ "abattoir" do tell(kill-all) if c = "all" .
---- ceq nkill(c) = enter @ "abattoir" do tell(kill-posts) || tell(kill-pid) if c = "posts" .
-
- eq nkill(c) =  ( enter @ "abattoir" do tell(c) ) || ( enter @ "top" do enter @ "abattoir" do  tell(c)  ) . 
-	
+ ceq nkill(c) = enter @ "abattoir" do tell(kill-all) if c = "all" .
+ ceq nkill(c) = enter @ "abattoir" do tell(kill-posts) || tell(kill-pid) if c = "posts" .
+ ceq nkill(c) =  ( enter @ "abattoir" do tell(c) ) || ( enter @ "top" do enter @ "abattoir" do ( tell(c) || tell("<pid|" . *)) ) if c =/= "all" /\ c =/= "posts" .
+ 	
  ceq fkill(c) = enter @ "abattoir" do tell(kill-all) if c = "all" .
  ceq fkill(c) = enter @ "abattoir" do tell(kill-posts) || tell(kill-pid) if c = "posts" .
- ceq fkill(c) = ( enter @ "abattoir" do tell(c) ) || 
-                ( enter @ "top" do enter @ "abattoir" do  tell(c)  ) if c =/= "all" /\ c =/= "posts" .
-
+ ceq fkill(c) = ( enter @ "abattoir" do tell("{k:" + c + "}") ) || ( enter @ "top" do enter @ "abattoir" do (tell("{k:" + c + "}") || tell(kill-pid)) ) if c =/= "all" /\ c =/= "posts" .
 
  ceq kill(c) = tell(kill-all) if c = "all" .
  ceq kill(c) = tell(kill-posts) || tell(kill-pid) if c = "posts" .
@@ -520,8 +505,7 @@ mod SYNTAX4SOCIALNET is
  eq repeat repeat P = repeat P .
  eq repeat ( P ||  Q) = repeat P || repeat Q .
 
- eq repeat P = rec 'vrep in ( P || 
-                    enter @ "abattoir" do unless kill-proc-cond next exit @ "abattoir" do  v('vrep) ) .
+ eq repeat P = rec 'vrep in ( P || unless kill-proc-cond next v('vrep)) .
 
  eq whenever c do P = rec 'vwhenever in ( ask header . c then P || unless kill-proc-cond next v('vwhenever)) .
 
