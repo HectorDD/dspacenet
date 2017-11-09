@@ -100,6 +100,16 @@ def addPid(program):
       index=program[oldindex:].find(pidstr)
   return program
 
+def addUser(program,user):
+  userstr='|usn>'
+  index=program.find(userstr)
+  oldindex=0
+  while index!=-1:
+      index=oldindex+index+1
+      program=program[:index]+user+program[index+3:]
+      oldindex=index+len(user)
+      index=program[oldindex:].find(userstr)
+  return program
 
 ##Function for replacing {pid} with the current ntcc clock
 def addPidPosted(program):
@@ -431,7 +441,7 @@ def runsccp():
         received=parsingResult[0]
     received = addPid(received)
     received = addPidPosted(received)
-    print received
+    received = addUser(received,userp)
     processes = received +" || " + processes
     maude.run("red in NTCC-RUN : IO(< "+processes+" ; "+memory+" >) . \n")
     answer=maude.getOutput()
