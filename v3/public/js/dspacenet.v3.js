@@ -21,7 +21,7 @@
   }
 
   function getWall(id) {
-    return $.get(`/api/space/wall/${id}`).promise();
+    return $.get(`/api/space/${id}`).promise();
   }
 
   function getGlobal() {
