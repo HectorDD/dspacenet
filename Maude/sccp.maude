@@ -1,4 +1,3 @@
-
 ---------------------------------------------------------
 ---- SCCP Virtual Machine
 ---- By: Héctor Delgado, Camilo Rueda and Frank Valencia.
@@ -25,7 +24,9 @@ mod STRING-PATTERN is
  op [_]* : Pattern -> Pattern [ctor] .
  op (_|_) : String Pattern -> Comp [ctor] .
 
- op number :  -> Pattern .
+ op isnumber :  -> Pattern .
+ op isdigit : -> Pattern .
+ op isnonz-digit : -> Pattern .
 
  vars  P P' Q Q' R : Pattern .
  vars S S' : String .
@@ -100,9 +101,12 @@ crl [and]:
  rl [staroperatorcasen]:
   ( S | [ P ]* )  =>  ( S |  P . [ P ]*  ) .
 
- eq number = [ "0" v "1" v "2" v "3" v "4" v "5" v "6" v "7" v "8" v "9" ]* .
 
+ eq isdigit = "0" v isnonz-digit .
 
+ eq isnonz-digit =   "1" v "2" v "3" v "4" v "5" v "6" v "7" v "8" v "9"  .
+
+ eq isnumber = isnonz-digit . [ isdigit ]* .
 
 endm
 -----------------
@@ -408,18 +412,21 @@ mod SYNTAX4SOCIALNET is
  inc SCCP .
 
  op header :  -> Pattern .
+ op @_ : String -> Int .
+
  op enter_do_ : Int SpaInstruc -> SpaInstruc [ctor prec 30] .
  op exit_do_ : Int SpaInstruc -> SpaInstruc [ctor prec 30] .
- ---op _@_ : SpaInstruc Nat -> SpaInstruc [ctor prec 30] .
- op @_ : String -> Int .
+
  op _^_ : SpaInstruc Nat -> SpaInstruc [ctor prec 30] .
  op [_]_ : SpaInstruc Nat -> SpaInstruc .
  op xtr : SpaInstruc Nat -> SpaInstruc .
  op call(_) : Qid -> SpaInstruc [ctor] .
+
+ op npost(_) : Const -> SpaInstruc [strat (0) prec 30] .
  op post(_) : Const -> SpaInstruc [strat (0) prec 30] .
- op fpost(_) : Const -> SpaInstruc [strat (0) prec 30] .
- op ppost(_) : Const -> SpaInstruc [strat (0) prec 30] .
- op npost(_) :  Const -> SpaInstruc [strat (0) prec 30] .
+ op rpost(_) : Const -> SpaInstruc [strat (0) prec 30] .
+
+
  op repeat_ : SpaInstruc -> SpaInstruc [strat (0) prec 30] .
  op whenever_do_ : Const SpaInstruc -> SpaInstruc [prec 30] .
  op until_do_ : Const SpaInstruc -> SpaInstruc [prec 30] .
@@ -428,19 +435,23 @@ mod SYNTAX4SOCIALNET is
  op now_do_ : Const SpaInstruc -> SpaInstruc [prec 30] .
  op now_then_else_ : Const SpaInstruc SpaInstruc -> SpaInstruc [prec 30] .
  op say(_) : Const -> SpaInstruc [strat (0) prec 30] .
- op kill(_) : Const -> SpaInstruc [strat (0) prec 30] .
- op fkill(_) : Const -> SpaInstruc [strat (0) prec 30] .
- op nkill(_) : Const -> SpaInstruc [strat (0) prec 30] .
+
+ op kill(_) : String -> SpaInstruc [strat (0) prec 30] .
+ op rm(_,_,_) : Pattern Pattern Pattern -> SpaInstruc [strat (0) prec 30] .
+
  op kill-pid :  -> Const .
  op kill-all : -> Const .
- op kill-posts : -> Const .
- op kill-post-cond : -> Const .
+ op kill-usn : -> Const .
  op kill-proc-cond : -> Const .
+
+ op loop : -> SpaInstruc .
  vars P P' Q : SpaInstruc .
  var i : Nat .
- vars c pid : Const .
+ var c : Const .
  var X : Qid .
- var agent : String .
+ vars agent s : String .
+
+ vars pid-p usr-p msg-p : Pattern .
 
  eq [P]i = s(P,i) .
  eq xtr(P,i) = x(P,i) .
@@ -451,61 +462,78 @@ mod SYNTAX4SOCIALNET is
  ceq exit i do P = x(P,i) if i >= 0 .
  eq exit i do P = skip [owise] .
 
- ---eq P @ i = s(P,i) .
+
 
  eq P ^ i = x(P,i ) .
 
---- Table of Agents
+
+--- Table of Agents (note: more effeciently as a hash table)
+------ users
  ceq @ agent = 0 if agent = "admin" .
  ceq @ agent = 1 if agent = "hector" .
  ceq @ agent = 3 if agent = "frank" .
  ceq @ agent = 5 if agent = "camilo" .
  ceq @ agent = 7 if agent = "jason" .
- 
+ ceq @ agent = 9 if agent = "santiago" .
+
+------ special spaces (top = table of processes, abattoir = contains pids to be killed )
  ceq @ agent = 2 if agent = "top" .
  ceq @ agent = 4 if agent = "abattoir" .
 
- eq  @ agent = -1 [owise]  .  
+--- error : check this use of [owise] .
+ eq  @ agent = -1 [owise]  .
 
+---- end Table of Agents.
+
+ eq loop = rec 'x in v('x) .
 
  eq header = "<" .  *   .
 
  eq kill-all  = "{k:a}" .
- eq kill-posts = "{k:p}" .
- eq kill-post-cond = kill-pid v kill-all  .
- eq kill-proc-cond = kill-pid v kill-all .
- eq kill-pid = "{k:pid}" .
+--- eq kill-posts = "{k:p}" .
+ eq kill-pid = "<pid|" .
+ eq kill-usn = "|usn>" .
+ ---eq kill-post-cond = kill-pid v kill-usn v kill-all .
+ eq kill-proc-cond = kill-pid v kill-usn v kill-all .
 
- ceq nkill(c) = enter @ "abattoir" do tell(kill-all) if c = "all" .
- ceq nkill(c) = enter @ "abattoir" do tell(kill-posts) || tell(kill-pid) if c = "posts" .
- ceq nkill(c) =  ( enter @ "abattoir" do tell(c) ) || ( enter @ "top" do enter @ "abattoir" do ( tell(c) || tell("<pid|" . *)) ) if c =/= "all" /\ c =/= "posts" .
- 	
- ceq fkill(c) = enter @ "abattoir" do tell(kill-all) if c = "all" .
- ceq fkill(c) = enter @ "abattoir" do tell(kill-posts) || tell(kill-pid) if c = "posts" .
- ceq fkill(c) = ( enter @ "abattoir" do tell("{k:" + c + "}") ) || ( enter @ "top" do enter @ "abattoir" do (tell("{k:" + c + "}") || tell(kill-pid)) ) if c =/= "all" /\ c =/= "posts" .
+--- ceq nkill(c) = enter @ "abattoir" do tell(kill-all) if c = "all" .
+--- ceq nkill(c) = enter @ "abattoir" do tell(kill-posts) || tell(kill-pid) if c = "posts" .
 
- ceq kill(c) = tell(kill-all) if c = "all" .
- ceq kill(c) = tell(kill-posts) || tell(kill-pid) if c = "posts" .
- ceq kill(c) = tell("{k:" + c + "}") || tell(kill-pid) if c =/= "all" /\ c =/= "posts" .
+ eq rm(* , * , *) =  ( enter @ "abattoir" do tell( * ) ) .
+ ceq rm(pid-p , * , *) =  ( enter @ "abattoir" do tell( "<" . pid-p . "|" . * ) ) if pid-p =/= * .
+ ceq rm(* , usr-p , *) =  ( enter @ "abattoir" do tell( * . "|" . usr-p . ">" . * ) ) if usr-p =/= * .
+ ceq rm(* , * , msg-p) = ( enter @ "abattoir" do tell( * . ">" . msg-p ) ) if msg-p =/= * .
+ eq rm(pid-p , usr-p , msg-p) =  ( enter @ "abattoir" do tell( "<" . pid-p . "|" . usr-p . ">" . msg-p ) ) [owise].
+---self-reference issue if we add this: || ( enter @ "top" do enter @ "abattoir" do  tell(....)  ) .
+
+ ceq kill(s) =
+  ( enter @ "abattoir" do (tell(kill-all) || tell( * ) ) ) ||
+  ( enter @ "top" do enter @ "abattoir" do  (tell(kill-all) || tell( * )  ) ) if s = "all" .
+
+ eq kill(s) =
+  (enter @ "abattoir" do ( tell("<" + s + "|") || tell( "|" + s + ">" )  ||  tell( "<" . s . "|" . * ) || tell( "<" . * . "|" . s . ">" . * )  ) )  ||
+  (enter @ "top" do
+   enter @ "abattoir" do  ( tell("<" + s + "|") || tell( "|" + s + ">" )  ||  tell( "<" . s . "|" . * ) || tell( "<" . * . "|" . s . ">" . * )  )   )
+    [owise] .
 
 
- 
- 
-eq npost(c) = tell(c) .
 
- eq post(c)  = rec 'vpost in ( tell(c) ||
-                    unless kill-post-cond next v('vpost) ) .
 
- eq fpost(c)  = rec 'vpost in ( tell(c) ||
-                    enter @ "abattoir" do unless kill-post-cond next exit @ "abattoir" do v('vpost) ) .
 
- eq ppost(c)  = rec 'vpost in ( tell(c) ||
-                                next v('vpost) ) .
+
+ eq post(c) = tell(c) .
+
+ eq npost(c) = post(c) .
+
+ eq rpost(c)  = rec 'vpost in ( tell(c) ||
+                    enter @ "abattoir" do unless kill-proc-cond next exit @ "abattoir" do v('vpost) ) .
+
 
  eq repeat repeat P = repeat P .
  eq repeat ( P ||  Q) = repeat P || repeat Q .
 
- eq repeat P = rec 'vrep in ( P || unless kill-proc-cond next v('vrep)) .
+ eq repeat P = rec 'vrep in ( P ||
+                    enter @ "abattoir" do unless kill-proc-cond next exit @ "abattoir" do  v('vrep) ) .
 
  eq whenever c do P = rec 'vwhenever in ( ask header . c then P || unless kill-proc-cond next v('vwhenever)) .
 
@@ -520,6 +548,8 @@ eq npost(c) = tell(c) .
 
  eq call(X) = unless kill-proc-cond next v(X) .
 endm
+
+
 
 mod NTCCPLUS+ is
  inc SCCP-SYMBOLS .
@@ -553,12 +583,12 @@ endm
 mod MEMORYKILL is
  inc SCCP-SYMBOLS .
  inc STRPAT-META .
- inc SYNTAX4SOCIALNET . 
+ inc SYNTAX4SOCIALNET .
  op memkill : Cloud -> Cloud .
  op auxmemkill : ConstSet ConstSet -> ConstSet .
- op forestkill : ForestConstSet Nat -> ForestConstSet . 
+ op forestkill : ForestConstSet Nat -> ForestConstSet .
  op auxforestkill : ForestConstSet -> ForestConstSet .
- op elimpid : ConstSet String -> ConstSet . 
+ op elimpid : ConstSet String -> ConstSet .
  op getpid : String -> String .
  op getTree : TreeConstSet Nat -> ConstSet .
  op match : String String -> Bool .
@@ -566,12 +596,12 @@ mod MEMORYKILL is
  vars R C : ConstSet .
  vars F F1 : ForestConstSet .
  vars T T2 : TreeConstSet .
- var S  : String . 
+ var S  : String .
  var N : Nat .
  var P : Const .
- eq getTree(T , N) = root((T) ^ N) . 
+ eq getTree(T , N) = root((T) ^ N) .
  eq memkill(R[F]) =  auxmemkill(R,getTree(R[F],@ "abattoir"))[ forestkill(F,@ "abattoir")] .
- 
+
  eq forestkill(T : F, s(N)) = memkill(T) : forestkill(F, N) .
  eq forestkill(C[F1] : F, 0) = empty[F1] : auxforestkill(F)  .
  eq forestkill(empty-forest, N) = empty-forest .
@@ -579,13 +609,13 @@ mod MEMORYKILL is
  eq auxforestkill(empty-forest) = empty-forest .
 
 
- 
+
 --- ceq elimpid((S,C),P) = elimpid(C,P) if S |- "<" . getpid(P) . * . ">" . *  .
 --- eq elimpid(C,P) = C [owise] .
  ceq getpid(S) = "" if S == "" .
  ceq getpid(S) = substr(S,0,1) + getpid(substr(S,1,length(S))) if ascii(substr(S,0,1)) > 47 /\ ascii(substr(S,0,1)) < 58 .
  eq getpid(S) = getpid(substr(S,1,length(S))) [owise] .
- 
+
  eq auxmemkill(empty,R) = empty .
  eq auxmemkill(R,empty) = R .
  ---ceq auxmemkill((P,R),(S,C)) = auxmemkill(R,(S,C)) if match(P,"<" + getpid(S))  .
@@ -593,7 +623,7 @@ mod MEMORYKILL is
  eq auxmemkill(R,C) = R [owise] .
 
  ceq match(P,S) = true if substr(P,0,length(S)) == S .
- eq match(P,S) = false [owise] . 
+ eq match(P,S) = false [owise] .
 endm
 
 ---red in MEMORYKILL : memkill(("<14 > sdasdd", "<12>asdkjajdsa", "<13>ajhsdjahsd")[empty[empty-forest] : empty[empty-forest] : "{k:12}"[empty-forest] : empty-forest]) .
@@ -657,5 +687,3 @@ mod U2N is
  eq u2n(next P) = next P .
 
 endm
-
-
