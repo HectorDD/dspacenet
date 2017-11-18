@@ -1,8 +1,10 @@
 /* global jQuery */
 
 (($) => {
+  // Time in miliseconds between each space posts update.
   const pollingInterval = 1000;
 
+  // DOM Elements being used.
   const $postsContainer = $('#postsContainer');
   const $processContainer = $('#processContainer');
   const $runProgramForm = $('#runProgramForm');
@@ -11,11 +13,27 @@
   const $skipBtn = $('#skipBtn');
   const $openTopBtn = $('#openTopBtn');
   const $postMsgBtn = $('#postMsgBtn');
-
+  const $runBtn = $('#runBtn');
   const $topModal = $('#topModal');
 
-  const space = $('#spacePath').val();
+  // Internal Data
+  const spacePath = $('#spacePath').val();
 
+  function renderMessage(messsage) {
+    return decodeURI(messsage).replace(/\n/g,'<br>');
+  }
+
+  /**
+    * Executes [program] in [path]
+    * @param {String} program program to execute
+    * @param {String} path path to the space where [program] will be executed.
+    * @param {ExecutionOptions} options
+    *
+    * @typedef ExecutionOptions
+    * @type {Object}
+    * @property {Boolean} [storeProcess=false] store process in TOP.
+    * @property {Boolean} [advanceTimeUnit=true] process will be executed in a new time unit.
+    */
   function runProgram(program, path, options) {
     return $.post(`/api/space/${path}`, Object.assign({ program }, options)).promise();
   }
@@ -38,7 +56,7 @@
         <div class="media">
           <img class="d-flex mr-3 rounded-circle" src="/images/users/small/${message.user_msg}.jpg">
           <div class="media-body text-break">
-            <strong>${message.user_msg}</strong> ${message.msg}
+            <strong>${message.user_msg}</strong> ${renderMessage(message.msg)}
             <div class="text-muted smaller">PID: ${message.clock}</div>
           </div>
         </div>
@@ -51,7 +69,7 @@
       <div class="list-group-item list-group-item-action flex-column align-items-start">
         <div class="d-flex w-100 justify-content-between">
           <div class="media-body text-break">
-            <strong>${message.user_msg}</strong> ${message.msg}
+            <strong>${message.user_msg}</strong> ${decodeURI(message.msg)}
             <div class="text-muted smaller">PID: ${message.clock}</div>
           </div>
         </div>
@@ -80,7 +98,7 @@
   }
 
   function updateWall() {
-    getWall(space).done((data) => {
+    getWall(spacePath).done((data) => {
       $postsContainer.empty();
       data.forEach((message) => { if (message.user_msg !== 'private') pushPost(message); });
       checkPosts();
@@ -100,11 +118,11 @@
   }
 
   function updateContent() {
-    if (space === '0') updateGlobal(); else updateWall();
+    if (spacePath === '0') updateGlobal(); else updateWall();
   }
 
   function startPolling() {
-    if (space === '0') {
+    if (spacePath === '0') {
       setInterval(updateGlobal, pollingInterval);
     } else {
       setInterval(updateWall, pollingInterval)
@@ -124,8 +142,8 @@
 
   function submitRunProgramForm(program) {
     $runProgramFormLoader.show();
-    runProgram(program, space, {
-      storeProcess: space !== '0',
+    runProgram(program, spacePath, {
+      storeProcess: spacePath !== '0',
     }).done(() => {
       $runProgramFormLoader.hide();
       $programInput.val('');
@@ -137,14 +155,27 @@
     });
   }
 
+  function submitProgramAsMessage() {
+    submitRunProgramForm(`npost("${encodeURI($programInput.val())}")`);
+  }
+
+  $programInput.keypress(function(event) {
+    if(event.which === 13 && !event.shiftKey && this.selectionEnd === this.value.length) {
+      submitProgramAsMessage()
+      event.preventDefault();
+      return false;
+    }
+    return true
+  });
+
   $runProgramForm.submit((event) => {
     event.preventDefault();
-    submitRunProgramForm($programInput.val());
+    submitProgramAsMessage()
     return false;
   });
 
-  $postMsgBtn.click(() => {
-    submitRunProgramForm(`npost("${$programInput.val()}")`);
+  $runBtn.click(() => {
+    submitRunProgramForm($programInput.val());
   })
 
   $skipBtn.click(() => {
@@ -152,7 +183,7 @@
   });
 
   $openTopBtn.click(() => {
-    getSpace(`${space}.2`).done((data) => {
+    getSpace(`${spacePath}.2`).done((data) => {
       $processContainer.empty();
       data.forEach(process => pushProcess(process));
       checkProcesses();

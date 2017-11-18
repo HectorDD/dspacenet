@@ -1,6 +1,7 @@
 *.txt
 ~*
 config.js
+old/
 
 # Logs
 logs
