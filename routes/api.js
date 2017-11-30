@@ -3,7 +3,7 @@
 const router = require('express').Router();
 const request = require('request-json');
 
-const config = require('./../../config');
+const config = require('./../config');
 
 const sccpClient = request.createClient(config.url);
 

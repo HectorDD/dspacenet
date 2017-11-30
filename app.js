@@ -7,37 +7,27 @@ var session = require('express-session');
 var hbs = require('hbs');
 var hbsutils = require('hbs-utils')(hbs);
 
-//var index = require('./routes/index');
-//var users = require('./routes/users');
-//var new1 = require('./routes/new');
-//var wall = require('./routes/wall');
-//var friend = require('./routes/friend');
-//var send = require('./routes/send');
-//var global = require('./routes/global');
-var api = require('./v3/routes/api');
-//var wallV2 = require('./v2/routes/wall');
-var space = require('./v3/routes/space');
-var login = require('./v3/routes/login');
+var api = require('./routes/api');
+var space = require('./routes/space');
+var login = require('./routes/login');
 
 
 var app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'templates/views'));
 app.set('view engine', 'hbs');
 
-hbsutils.registerWatchedPartials(path.join(__dirname, 'v3/templates/views/partials'));
-require('./v3/templates/views/helpers');
+hbsutils.registerWatchedPartials(path.join(__dirname, 'templates/views/partials'));
+require('./templates/views/helpers');
 hbs.localsAsTemplateData(app);
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({secret:"este es mi secreto"}));
-app.use(express.static(path.join(__dirname, 'v3/public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 //app.use(express.static('public'));
 app.use('/login',login);
@@ -50,22 +40,9 @@ app.use(function (req, res, next) {
     next();
   }
 });
-//app.use('/', index);
-//app.use('/users', users);
-//app.use('/prev', index);
-//app.use('/logout', index);
-//app.use('/friend', friend);
-//app.use('/send', send);
-//app.use('/global', global);
 app.use('/api', api);
-
-//app.use('/oldwall', wall);
-//app.use('/wall/', wallV2);
-
-//V3
 app.use('/space/', space);
-
-app.use('/', function (req, res) {
+app.get('/', function (req, res) {
   res.redirect('/space/global');
 })
 

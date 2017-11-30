@@ -1,8 +1,7 @@
 const router = require('express').Router();
-const db_users = require('../../db/users');
+const db_users = require('../db/users');
 
-const view = __dirname + '/../templates/views/login';
-const layout = '../v3/templates/views/layouts/simple';
+const layout = 'layouts/simple';
 
 router.get('/',(req, res) => {
   if (req.session.userId !== undefined) {
@@ -13,7 +12,7 @@ router.get('/',(req, res) => {
   } else {
     const error = req.session.error;
     req.session.error = undefined;
-    res.render(view, { layout, error });
+    res.render('login', { layout, error });
   }
 });
 
