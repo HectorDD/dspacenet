@@ -23,6 +23,58 @@ nameprocess=systemfiles+"process.txt"
 memory=""
 processes=""
 ntcctime=getNtccTime()
+memoryDicc={}
+notbussy=True
+##Function that obtains every message inside a string of messages from the memory of an agent
+##stringMessages: '"message 1", "message 2", "message 3" ... '
+##return: ['message 1', 'message 2', 'message 3' ...]
+def splitMessages(stringMessages):
+    messages=[]
+    message=""
+    quotecounter=0
+    for c in stringMessages:
+        if c=='"':
+            quotecounter+=1
+        elif c=="," and quotecounter%2 == 0:
+            messages.append(message)
+            message=""
+        elif quotecounter%2 != 0:
+            message=message+c
+    messages.append(message)
+    return messages
+
+def storeChild(memory,stack,i):
+    global memoryDicc
+    path = str(stack[0])
+    for j in stack[1:]:
+        path=path+"."+str(j)
+    agentString=memory[i:]
+    index=agentString.find("[")
+    if index!= -1:
+        agentString=agentString[:index]
+        messages=splitMessages(agentString)
+        memoryDicc[path] = messages
+    return index
+
+def storeMemory(mem) :
+    stack=[0]
+    i=storeChild(mem,stack,0)
+    while i < len(mem) :
+        if mem[i] == "[" :
+            stack.append(0)
+            i+=1
+        elif mem[i] == "]" :
+            stack.pop()
+            i+=1
+        elif mem[i] == ":" :
+            stack.append(stack.pop()+1)
+            i+=1
+        elif mem[i:i+12]=="empty-forest":
+            i+=12
+        elif mem[i] == " ":
+            i+=1
+        else:
+            i+=storeChild(mem,stack,i)
 
 ##Function that errase spaces from a program,
 ##that are after every ocurrency of the searchingString
@@ -111,7 +163,7 @@ def addIdandOrder(program,id_user):
   oldindex=0
   while index!=-1:
       index=oldindex+index+6
-      userstr="<pids|" +str(id_user)+">"
+      userstr="<pids|p|" +str(id_user)+">"
       program=program[:index]+userstr+program[index:]
       oldindex=index+len(userstr)
       index=program[oldindex:].find(tellstr)
@@ -131,7 +183,7 @@ def addIdandOrderSay(program,id_user):
   ntcctime=getNtccTime()
   while index!=-1:
       index=oldindex+index+5
-      userstr="<pids|" +str(id_user)+">"
+      userstr="<pids|s|" +str(id_user)+">"
       program=program[:index]+userstr+program[index:]
       oldindex=index+len(userstr)
       index=program[oldindex:].find(tellstr)
@@ -153,7 +205,7 @@ def extractInfo(msg):
         info=parseResult[0]
         message=parseResult[1]
         info=info.split("|")
-        r={'clock' : info[0] , 'user_msg' : info[1] , 'msg' : message , 'class' : "none" }
+        r={'clock' : info[0] , 'user_msg' : info[2] , 'msg' : message , 'class' : "none" }
     return r
 
 ##Procediment that load the current state from the txt files
@@ -169,9 +221,12 @@ def refreshState():
     memory = mem.readline()
     mem.close()
     proc.close()
+
 refreshState()
 
 ##Function that eliminate the first agent of the agents string
+##input: agents -> string with agents
+##output: agents -> string with agents, but without the first one
 def elimOther(agents):
     stack=[]
     index=0
@@ -195,6 +250,8 @@ def elimOther(agents):
     return agents[index:]
 
 ##Function that choose the first agent of the agents string
+##input: agents -> string with agents
+##output: agents -> the first agent on the string
 def getCurrAgent(agents):
     stack=[]
     index=0
@@ -216,23 +273,7 @@ def getCurrAgent(agents):
             break
     return agents[:index]
 
-##Function that obtains every message inside a string of messages from the memory of an agent
-##stringMessages: '"message 1", "message 2", "message 3" ... '
-##return: ['message 1', 'message 2', 'message 3' ...]
-def splitMessages(stringMessages):
-    messages=[]
-    message=""
-    quotecounter=0
-    for c in stringMessages:
-        if c=='"':
-            quotecounter+=1
-        elif c=="," and quotecounter%2 == 0:
-            messages.append(message)
-            message=""
-        elif quotecounter%2 != 0:
-            message=message+c
-    messages.append(message)
-    return messages
+
 
 ##Function that convert the agent memory in a json list with every message with their information
 def convertMemInJson(mem):
@@ -252,7 +293,9 @@ def convertMemInJson(mem):
     return jMessages
 
 
-##Function that iterate on the memory, searching the space of an agent
+##Function that go through on the memory, searching the space of an agent
+##input: agentId -> id of the agent that want to calculate
+##output: agents -> the agent memory
 def calculateAgentMemory(agentId):
     refreshState()
     parsingResult=parse("{}[{}]", memory )
@@ -265,6 +308,10 @@ def calculateAgentMemory(agentId):
 
     return agents
 
+##Function that go through on the memory, searching the space of an agent
+##input: store -> the store of the system
+##input: agentId -> id of the agent that want to calculate
+##output: agents -> the agent memory
 def calculateAgentMemoryAlpha(store,agentId):
     parsingResult=parse("{}[{}]", store)
     agents=parsingResult[1]
@@ -274,17 +321,22 @@ def calculateAgentMemoryAlpha(store,agentId):
     agents=getCurrAgent(agents)
     return agents
 
-def replacePidAfter(process,timeunit):
+##Function for adding the program id and user to every post in a process
+##input: memory -> memory without current pid
+##input: timeunit -> current timeunit
+##output: memory -> memory with current pid
+##on posts
+def replacePidAfter(memory,timeunit):
     timeunit=str(timeunit)
     pidstr='<pids|'
-    index=process.find(pidstr)
+    index=memory.find(pidstr)
     oldindex=0
     while index!=-1:
         index=oldindex+index+1
-        process=process[:index]+timeunit+process[index+4:]
+        memory=memory[:index]+timeunit+memory[index+4:]
         oldindex=index+len(timeunit)
-        index=process[oldindex:].find(pidstr)
-    return process
+        index=memory[oldindex:].find(pidstr)
+    return memory
 
 ##Procediment that store a successful execution on the memory and processes txt files
 def saveState(result):
@@ -292,6 +344,7 @@ def saveState(result):
     ntcctime=getNtccTime()
     global processes
     global memory
+    global memoryDicc
     parsingResult=parse("result Conf: < {} ; {} >", result )
     processes=parsingResult[0]
     memory=parsingResult[1]
@@ -299,6 +352,8 @@ def saveState(result):
     mem=open(namememory,"w")
     mem.write(memory)
     mem.close()
+    memoryDicc = {}
+    storeMemory(memory)
     proc=open(nameprocess,"w")
     proc.write(processes)
     proc.close()
@@ -314,6 +369,7 @@ def errorToJson(errors):
         jErrors.append(element)
     return jErrors
 
+
 ##Routes of the rest server
 import os
 app = Flask(__name__)
@@ -322,6 +378,8 @@ app = Flask(__name__)
 @app.route('/', methods=['GET'])
 def index():
     return jsonify({'message' : 'SCCP'})
+
+
 
 ##This route is for running a program
 ##It comunicate the program to the sccp
@@ -339,53 +397,67 @@ def index():
 ## "errors" : "if the result is error,
 ## here will be the maude errors"
 ##}
+
 @app.route('/runsccp', methods=['POST'])
 def runsccp():
-    global ntcctime
-    ntcctime=getNtccTime()
-    global processes
-    global memory
-    global maude
-    refreshState()
-    received = request.json['config']
-    userp = request.json['user']
-    try:
-        timeunit = request.json['timeu']
-    except:
-        timeunit = True
-    if received=="":
-        return jsonify({'result' : 'error', 'errors' : [{'error' : 'empty input'}]})
-    received = erraseSpacePostAndSay(received,"post")
-    received = erraseSpacePostAndSay(received,"say")
-    received = addIdandOrder(received,userp)
-    print received
-    try:
-        receivedstr=str(received)
-    except:
-        errors=errorToJson(["characters not allowed"])
-        return jsonify({'result' : 'error', 'errors' : errors })
-    maude.run("red in SCCP-RUN : "+received+" . \n")
-    answer=maude.getOutput()
-    if answer[0]=="error":
-        errors=errorToJson(answer[1])
-        return jsonify({'result' : 'error', 'errors' : errors })
+    global notbussy
+    if notbussy:
+        notbussy=False
+        global ntcctime
+        ntcctime=getNtccTime()
+        global processes
+        global memory
+        global maude
+        refreshState()
+        received = request.json['config']
+        userp = request.json['user']
+        try:
+            timeunit = request.json['timeu']
+        except:
+            timeunit = True
+        if received=="":
+            notbussy=True
+            return jsonify({'result' : 'error', 'errors' : [{'error' : 'empty input'}]})
+        received = erraseSpacePostAndSay(received,"post")
+        received = erraseSpacePostAndSay(received,"say")
+        received = addIdandOrder(received,userp)
+        print received
+        try:
+            receivedstr=str(received)
+        except:
+            errors=errorToJson(["characters not allowed"])
+            notbussy=True
+            return jsonify({'result' : 'error', 'errors' : errors })
+        maude.run("red in SCCP-RUN : "+received+" . \n")
+        answer=maude.getOutput()
+        if answer[0]=="error":
+            errors=errorToJson(answer[1])
+            notbussy=True
+            return jsonify({'result' : 'error', 'errors' : errors })
+        else:
+            parsingResult=parse("result SpaInstruc: {}", answer[1] )
+            received=parsingResult[0]
+        received = addPid(received)
+        received = addPidPosted(received)
+        received = addUser(received,userp)
+        processes = received +" || " + processes
+        maude.run("red in NTCC-RUN : IO(< "+processes+" ; "+memory+" >) . \n")
+        answer=maude.getOutput()
+        if answer[0]=="error":
+            errors=errorToJson(answer[1])
+            notbussy=True
+            return jsonify({'result' : 'error', 'errors' : errors})
+        else:
+            try:
+                saveState(answer[1])
+            except:
+                notbussy=True
+            if timeunit:
+                ntccTictac(ntcctime)
+            notbussy=True
+            return jsonify({'result' : 'ok'})
     else:
-        parsingResult=parse("result SpaInstruc: {}", answer[1] )
-        received=parsingResult[0]
-    received = addPid(received)
-    received = addPidPosted(received)
-    received = addUser(received,userp)
-    processes = received +" || " + processes
-    maude.run("red in NTCC-RUN : IO(< "+processes+" ; "+memory+" >) . \n")
-    answer=maude.getOutput()
-    if answer[0]=="error":
-        errors=errorToJson(answer[1])
-        return jsonify({'result' : 'error', 'errors' : errors})
-    else:
-        saveState(answer[1])
-        if timeunit:
-            ntccTictac(ntcctime)
-        return jsonify({'result' : 'ok'})
+        return jsonify({'result' : 'error', 'errors' : [{'error' : "bussy, try again"}]})
 
 ##This route is for get the information of a space
 ##It obtain the information of the space from
@@ -399,24 +471,42 @@ def runsccp():
 ##{
 ## "result" : "it could have the list of constraints or an error",
 ##}
+#@app.route('/getSpace', methods=['POST'])
+# def getSpace():
+#     agent=request.json['id']
+#     try:
+#         answer=calculateAgentMemory(int(agent[0]))
+#         agent.pop(0)
+#         for i in agent:
+#             answer=calculateAgentMemoryAlpha(answer,int(i))
+#         paranswer=parse("{}[{}]", answer )
+#         try:
+#             ranswer=paranswer[0]
+#             rranswer=convertMemInJson(ranswer)
+#             rranswer.sort(key=lambda clock: int(clock['clock']),reverse=True)
+#             return jsonify({'result' : rranswer})
+#         except:
+#             return jsonify({'result' : 'error1'})
+#     except:
+#         return jsonify({'result' : 'error2'})
+
 @app.route('/getSpace', methods=['POST'])
 def getSpace():
+    global memoryDicc
     agent=request.json['id']
+    path="0"
+    for i in agent:
+        path=path+"."+str(i)
     try:
-        answer=calculateAgentMemory(int(agent[0]))
-        agent.pop(0)
-        for i in agent:
-            answer=calculateAgentMemoryAlpha(answer,int(i))
-        paranswer=parse("{}[{}]", answer )
-        try:
-            ranswer=paranswer[0]
-            rranswer=convertMemInJson(ranswer)
-            rranswer.sort(key=lambda clock: int(clock['clock']),reverse=True)
-            return jsonify({'result' : rranswer})
-        except:
-            return jsonify({'result' : 'error1'})
+        result=memoryDicc[path]
+        newResult=[]
+        for i in result:
+            newResult.append(extractInfo(i))
+        result=newResult
     except:
-        return jsonify({'result' : 'error2'})
+        result = []
+    result.sort(key=lambda clock: int(clock['clock']),reverse=True)
+    return jsonify({'result' : result})
 
 ##This function returns the global memory
 @app.route('/getGlobal', methods=['GET'])

@@ -156,7 +156,7 @@
   }
 
   function submitProgramAsMessage() {
-    submitRunProgramForm(`npost("${encodeURI($programInput.val())}")`);
+    submitRunProgramForm(`post("${encodeURI($programInput.val())}")`);
   }
 
   $programInput.keypress(function(event) {
