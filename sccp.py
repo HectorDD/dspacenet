@@ -111,7 +111,7 @@ def addIdandOrder(program,id_user):
   oldindex=0
   while index!=-1:
       index=oldindex+index+6
-      userstr="<pide|" +str(id_user)+">"
+      userstr="<pids|" +str(id_user)+">"
       program=program[:index]+userstr+program[index:]
       oldindex=index+len(userstr)
       index=program[oldindex:].find(tellstr)
@@ -131,7 +131,7 @@ def addIdandOrderSay(program,id_user):
   ntcctime=getNtccTime()
   while index!=-1:
       index=oldindex+index+5
-      userstr="<"+str(ntcctime)+"|" +str(id_user)+">"
+      userstr="<pids|" +str(id_user)+">"
       program=program[:index]+userstr+program[index:]
       oldindex=index+len(userstr)
       index=program[oldindex:].find(tellstr)
@@ -276,7 +276,7 @@ def calculateAgentMemoryAlpha(store,agentId):
 
 def replacePidAfter(process,timeunit):
     timeunit=str(timeunit)
-    pidstr='<pide|'
+    pidstr='<pids|'
     index=process.find(pidstr)
     oldindex=0
     while index!=-1:
