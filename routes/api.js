@@ -3,7 +3,8 @@
 const router = require('express').Router();
 const nodeCrontab = require('crontab');
 
-const { runSCCP, sccpClient } = require('../helpers/sccpClient');
+const runSCCP = require('../helpers/sccpClient').runSCCP;
+const sccpClient = require('../helpers/sccpClient').sccpClient;
 
 // router.post('/message/:recipient/', (req, res) => {
 //   var config = embed(embed(embed(req.body.message, req.session.id_user), 0), req.params.recipient);
