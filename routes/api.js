@@ -94,7 +94,8 @@ router.post('/space/:path', (req, res) => {
     req.body.program === 'skip' ?
       'skip' :
       `${req.body.program} || enter @ "top" do post("${req.body.program.replace(/"/g,'\'')}")`;
-  runSCCP(program, path, req.session.user).then(({ body }) => {
+  runSCCP(program, path, req.session.user).then((result) => {
+    const body = result.body;
     if (body.result === "error") {
       let result = "";
       body.errors.forEach(error => {result = `\n${result} ${error.error}`});
