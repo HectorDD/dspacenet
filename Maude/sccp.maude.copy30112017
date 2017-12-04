@@ -479,7 +479,6 @@ mod SYNTAX4SOCIALNET is
 ------ special spaces (top = table of processes, abattoir = contains pids to be killed )
  ceq @ agent = 2 if agent = "top" .
  ceq @ agent = 4 if agent = "abattoir" .
- ceq @ agent = 6 if agent = "clock" .
 
 --- error : check this use of [owise] .
  eq  @ agent = -1 [owise]  .
