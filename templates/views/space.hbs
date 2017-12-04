@@ -16,6 +16,9 @@
     <span class="input-group-btn">
       <button type="button" class="btn btn-info" id="openTopBtn" data-toggle="tooltip" title="Show Top"><i class="fa fa-cogs"></i></button>
     </span>
+    <span class="input-group-btn">
+      <button type="button" class="btn btn-info" id="openTimerDialogBtn" data-toggle="tooltop" title="Set Timer"><i class="fa fa-clock-o"></i></button>
+    </span>
     {{/if}}
     <textarea class="form-control border-right-0" placeholder="Post your program or message here. Press SHIFT+ENTER to insert a line break." id="programInput"></textarea>
     <input type="hidden" value="{{spaceId}}" id="spacePath">
@@ -44,7 +47,7 @@
 
 {{! extensions }}
 {{#extend 'scripts' }}
-<script src="/js/dspacenet.v3.js"></script>
+<script src="/js/dspacenet.js"></script>
 {{/extend}}
 
 {{#extend 'styles' }}
@@ -54,5 +57,6 @@
 {{#extend 'modals' }}
   {{#if ownSpace}}
     {{> topModal}}
+    {{> timerModal}}
   {{/if}}
 {{/extend}}
