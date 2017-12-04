@@ -70,6 +70,7 @@ class MaudeProcess:
     def __init__(self):
         self.output=""
         self.t=0.01
+        self.timeout=700
         # define f as a temporal file
         self.f = tempfile.TemporaryFile()
         # start Maude process, redirect stdout and stderr to f
@@ -96,7 +97,7 @@ class MaudeProcess:
         r=self.f.read()
         # wait the output of the process, if is successful or have warnings
         i=0
-        while (i<300 and not ("result" in r or "Warning" in r)):
+        while (i<self.timeout and not ("result" in r or "Warning" in r)):
             time.sleep(self.t)
             self.f.seek(0)
             r=self.f.read()
@@ -104,7 +105,7 @@ class MaudeProcess:
         self.f.seek(0)
         #erase the content of the output file
         self.f.truncate()
-        if i==300:
+        if i==self.timeout:
             self.renewProcess()
             self.output="timeout"
         else:

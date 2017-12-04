@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const db_users = require('../db/users');
+const db = require('../helpers/db');
 
 const layout = 'layouts/simple';
 
@@ -17,7 +17,7 @@ router.get('/',(req, res) => {
 });
 
 router.post('/', (req, res) => {
-  db_users.getId(req.body.user, (users) => {
+  db.getId(req.body.user, (users) => {
     if (users[0] === undefined) {
       req.session.error = 'User not found';
       res.redirect('login');
