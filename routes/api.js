@@ -2,6 +2,7 @@
 
 const router = require('express').Router();
 const nodeCrontab = require('crontab');
+const joinPath = require('path').join;
 
 const runSCCP = require('../helpers/sccpClient').runSCCP;
 const sccpClient = require('../helpers/sccpClient').sccpClient;
@@ -74,7 +75,7 @@ router.get('/space/:path/timer/:timer', (req, res) => {
     } else {
       crontab.remove({ comment: new RegExp(`p${path}\$`) });
       if (timer !== 0) {
-        crontab.create(`node ${__dirname}/../helpers/tickWorker.js ${path}`, null, `p${path}$ > cronWorker.txt`).minute().every(timer);
+        crontab.create(`${process.execPath} ${joinPath(__dirname, '../helpers/tickWorker.js')} ${path}`, null, `p${path}$ > cronWorker.txt`).minute().every(timer);
         crontab.save((err2) => {
           if (err2) {
             res.status(400).json({ error: err2 }).end();
