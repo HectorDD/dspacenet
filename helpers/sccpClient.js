@@ -11,10 +11,10 @@ function spaceWrap(program, path) {
   return result;
 }
 
-async function runSCCP(program, path, user) {
+async function runSCCP(program, path, user, timeu=1) {
   try {
     return await sccpClient.post('/runsccp',{
-      config: spaceWrap(program, path), user
+      config: spaceWrap(program, path), user, timeu
     })
   } catch(error) {
     throw error;

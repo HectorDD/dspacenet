@@ -73,17 +73,17 @@ router.get('/space/:path/timer/:timer', (req, res) => {
     if (err) {
       res.status(504).json({ error: err }).end();
     } else {
-      crontab.remove({ comment: new RegExp(`p${path}\$`) });
+      crontab.remove({ comment: new RegExp(`p${path}\\\$`) });
       if (timer !== 0) {
-        crontab.create(`${process.execPath} ${joinPath(__dirname, '../helpers/tickWorker.js')} ${path}`, null, `p${path}$ > cronWorker.txt`).minute().every(timer);
-        crontab.save((err2) => {
-          if (err2) {
-            res.status(400).json({ error: err2 }).end();
-          } else {
-            res.status(200).json({ success: true }).end();
-          }
-        });
-      } else res.status(200).json({ success: true}).end();
+        crontab.create(`${process.execPath} ${joinPath(__dirname, '../helpers/tickWorker.js')} ${path}`, null, `p${path}$`).minute().every(timer);
+      }
+      crontab.save((err2) => {
+        if (err2) {
+          res.status(400).json({ error: err2 }).end();
+        } else {
+          res.status(200).json({ success: true }).end();
+        }
+      });
     }
   });
 });

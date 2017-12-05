@@ -411,10 +411,8 @@ def runsccp():
         refreshState()
         received = request.json['config']
         userp = request.json['user']
-        try:
-            timeunit = request.json['timeu']
-        except:
-            timeunit = True
+        timeunit = str(request.json['timeu'])
+        print timeunit
         if received=="":
             notbussy=True
             return jsonify({'result' : 'error', 'errors' : [{'error' : 'empty input'}]})
@@ -452,7 +450,7 @@ def runsccp():
                 saveState(answer[1])
             except:
                 notbussy=True
-            if timeunit:
+            if timeunit=="1":
                 ntccTictac(ntcctime)
             notbussy=True
             return jsonify({'result' : 'ok'})
