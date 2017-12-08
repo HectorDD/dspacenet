@@ -200,7 +200,7 @@
 
   $setTimerForm.submit((event) => {
     event.preventDefault();
-
+    $.post("/api/space/:space/timer/")
     return false;
   });
 

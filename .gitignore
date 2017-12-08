@@ -2,6 +2,7 @@
 ~*
 config.js
 old/
+backup/
 
 # Logs
 logs
