@@ -3,14 +3,14 @@ const db = require('../helpers/db');
 
 const layout = 'layouts/simple';
 
-router.get('/',(req, res) => {
+router.get('/', (req, res) => {
   if (req.session.userId !== undefined) {
     if (req.query.logout !== undefined) {
       req.session.destroy();
       res.redirect('/');
     } else res.redirect('space/global');
   } else {
-    const error = req.session.error;
+    const { error } = req.session;
     req.session.error = undefined;
     res.render('login', { layout, error });
   }
