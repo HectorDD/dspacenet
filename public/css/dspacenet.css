@@ -27,3 +27,9 @@
 .text-break {
   word-break: break-word;
 }
+
+.gear-loader {
+  background:url(../images/Gear.gif);
+  background-position:right;
+  background-repeat: no-repeat;
+}
