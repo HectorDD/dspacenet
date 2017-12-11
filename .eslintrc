@@ -11,6 +11,8 @@
         },
         "sourceType": "module"
     },
-    "rules": {},
-    "extends":"airbnb"
+    "rules": {
+        "linebreak-style": "off"
+    },
+    "extends": "airbnb-base"
 }

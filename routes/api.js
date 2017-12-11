@@ -1,11 +1,8 @@
-'use strict'
-
 const router = require('express').Router();
 const nodeCrontab = require('crontab');
 const joinPath = require('path').join;
 
-const runSCCP = require('../helpers/sccpClient').runSCCP;
-const sccpClient = require('../helpers/sccpClient').sccpClient;
+const { runSCCP, sccpClient } = require('../helpers/sccpClient');
 
 // router.post('/message/:recipient/', (req, res) => {
 //   var config = embed(embed(embed(req.body.message, req.session.id_user), 0), req.params.recipient);
@@ -37,19 +34,19 @@ const sccpClient = require('../helpers/sccpClient').sccpClient;
 //   });
 // });
 
-router.get('/space/global/' , function(req, res, next) {
-    sccpClient.get('/getGlobal', (err, res2, body) => {
+router.get('/space/global/', (req, res) => {
+  sccpClient.get('/getGlobal', (err, res2, body) => {
     if (err) {
-      res.status(504).json({error: err });
+      res.status(504).json({ error: err });
     } else res.json(body.result);
     res.end();
-    });
+  });
 });
 
 router.get('/space/:path', (req, res) => {
   sccpClient.post('/getSpace', { id: req.params.path.split('.') }, (err, res2, body) => {
     if (err) {
-      res.status(504).json({error: err});
+      res.status(504).json({ error: err });
     } else {
       res.json(body.result);
     }
@@ -57,25 +54,25 @@ router.get('/space/:path', (req, res) => {
   });
 });
 
-router.get('/space/wall/:spaceId',(req, res) => {
+router.get('/space/wall/:spaceId', (req, res) => {
   sccpClient.post('/getWall', { id: req.params.spaceId }, (err, res2, body) => {
     if (err) {
-      res.status(504).json({error: err });
+      res.status(504).json({ error: err });
     } else res.json(body.result);
     res.end();
   });
 });
 
-router.get('/space/:path/timer/:timer', (req, res) => {
+router.post('/space/:path/timer/:timer', (req, res) => {
   const path = req.params.path === '0' ? '' : req.params.path;
   const timer = parseInt(req.params.timer, 10);
   nodeCrontab.load((err, crontab) => {
     if (err) {
       res.status(504).json({ error: err }).end();
     } else {
-      crontab.remove({ comment: new RegExp(`p${path}\\\$`) });
+      crontab.remove({ comment: new RegExp(`p${path}\\$`) });
       if (timer !== 0) {
-        crontab.create(`${process.execPath} ${joinPath(__dirname, '../helpers/tickWorker.js')} ${path}`, null, `p${path}$`).minute().every(timer);
+        crontab.create(`${process.execPath} ${joinPath(__dirname, '../helpers/frankWorker.js')} ${path}`, null, `p${path}$`).minute().every(timer);
       }
       crontab.save((err2) => {
         if (err2) {
@@ -90,17 +87,17 @@ router.get('/space/:path/timer/:timer', (req, res) => {
 
 router.post('/space/:path', (req, res) => {
   const path = req.params.path === '0' ? '' : req.params.path;
-  const program = req.body.storeProcess !== "true" ?
-      req.body.program :
-    req.body.program === 'skip' ?
-      'skip' :
-      `${req.body.program} || enter @ "top" do post("${req.body.program.replace(/"/g,'\'')}")`;
-  runSCCP(program, path, req.session.user).then((result) => {
-    const body = result.body;
-    if (body.result === "error") {
-      let result = "";
-      body.errors.forEach(error => {result = `\n${result} ${error.error}`});
-      res.status(400).json({error: result}).end();
+  let program;
+  if (req.body.storeProcess !== 'true') {
+    program = req.body.program;
+  } else if (req.body.program === 'skip') {
+    program = 'skip';
+  } else program = `${req.body.program} || enter @ "top" do post("${req.body.program.replace(/"/g, '\'')}")`;
+  runSCCP(program, path, req.session.user).then(({ body }) => {
+    if (body.result === 'error') {
+      let result = '';
+      body.errors.forEach((error) => { result = `\n${result} ${error.error}`; });
+      res.status(400).json({ error: result }).end();
     } else res.json({ success: true }).end();
   }).catch(error => res.status(504).json({ error }).end());
 });
