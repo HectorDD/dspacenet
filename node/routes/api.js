@@ -72,7 +72,7 @@ router.post('/space/:path/timer/:timer', (req, res) => {
     } else {
       crontab.remove({ comment: new RegExp(`p${path}\\$`) });
       if (timer !== 0) {
-        crontab.create(`${process.execPath} ${joinPath(__dirname, '../helpers/tickWorker.js')} ${path}`, null, `p${path}$`).minute().every(timer);
+        crontab.create(`${process.execPath} ${joinPath(__dirname, '../helpers/frankWorker.js')} ${path}`, null, `p${path}$`).minute().every(timer);
       }
       crontab.save((err2) => {
         if (err2) {
