@@ -1,0 +1,26 @@
+version: '2'
+services:
+  sccp:
+    build: ./python
+    volumes: 
+      - ./python:/app
+    ports:
+      - "$SCCP_PORT:$SCCP_PORT"
+    working_dir: /app
+    tty: true
+  db:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_DATABASE
+    ports: 
+      - "3306:3306"
+    volumes: 
+      - ./db:/var/lib/mysql
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"
