@@ -3,6 +3,7 @@
 config.js
 old/
 backup/
+.vscode/
 
 # Logs
 logs
