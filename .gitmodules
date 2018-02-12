@@ -1,0 +1,12 @@
+[submodule "client"]
+	path = client
+	url = https://github.com/dspacenet/client
+[submodule "api"]
+	path = api
+	url = https://github.com/dspacenet/api
+[submodule "sccp"]
+	path = sccp
+	url = https://github.com/dspacenet/sccp
+[submodule "sccp-client"]
+	path = sccp-client
+	url = https://github.com/dspacenet/sccp-client
