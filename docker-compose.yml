@@ -1,9 +1,9 @@
 version: '2'
 services:
   sccp:
-    build: ./python
+    build: ./sccp-client
     volumes: 
-      - ./python:/app
+      - ./sccp-client:/app
     ports:
       - "$SCCP_PORT:$SCCP_PORT"
     working_dir: /app
