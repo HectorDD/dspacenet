@@ -4,12 +4,13 @@ services:
     build: ./sccp-client
     volumes: 
       - ./sccp-client:/app
+      - ./sccp:/sccp
     ports:
       - "$SCCP_PORT:$SCCP_PORT"
     working_dir: /app
     tty: true
   db:
-    image: mysql
+    image: mysql:5
     environment:
       - MYSQL_ROOT_PASSWORD
       - MYSQL_USER
