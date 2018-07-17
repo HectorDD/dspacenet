@@ -1,14 +1,5 @@
 version: '2'
 services:
-  sccp:
-    build: ./sccp-client
-    volumes: 
-      - ./sccp-client:/app
-      - ./sccp:/sccp
-    ports:
-      - "$SCCP_PORT:$SCCP_PORT"
-    working_dir: /app
-    tty: true
   db:
     image: mysql:5
     environment:
