@@ -7,6 +7,3 @@
 [submodule "sccp"]
 	path = sccp
 	url = https://github.com/dspacenet/sccp
-[submodule "sccp-client"]
-	path = sccp-client
-	url = https://github.com/dspacenet/sccp-client
